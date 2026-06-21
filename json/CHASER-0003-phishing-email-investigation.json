@@ -1,0 +1,345 @@
+{
+  "$schema": "./chaser-card.schema.json",
+  "id": "CHASER-0003",
+  "slug": "phishing-email-investigation",
+  "title": "Phishing Email Investigation",
+  "subtitle": "Suspicious Email, Links, and Attachments",
+  "version": "1.0.0",
+  "status": "active",
+  "created": "2026-06-19",
+  "updated": "2026-06-21",
+  "author": {
+    "name": "Richard Vallejo",
+    "website": "https://richardvallejo.com"
+  },
+  "license": "CC BY 4.0",
+  "branding": {
+    "series": "CHASER Cards",
+    "repository": "https://github.com/richvallejo/chaser-cards"
+  },
+  "chaser_model": {
+    "version": "2026-06-18",
+    "source": "https://richardvallejo.com/chaser.html",
+    "stage_questions": {
+      "context": "What are we hunting for, and why does it matter?",
+      "hypothesis": "What do we believe may be happening in the environment?",
+      "analyze": "What evidence do we need to examine?",
+      "strategize": "How are we going to run the hunt?",
+      "execute": "What do we do with what we found?",
+      "review": "What did we learn, and what should change?"
+    },
+    "stage_purposes": {
+      "context": "Relevant CVEs, techniques, affected systems, known behaviors, likely impact, and indicators.",
+      "hypothesis": "A testable statement that identifies likely behavior, affected environment, and evidence that would support or challenge the hunt.",
+      "analyze": "Telemetry and evidence sources needed to confirm, weaken, or disprove the hypothesis, including visibility gaps.",
+      "strategize": "Scope, time window, affected assets, search logic, pivots, enrichment, expected results, false positives, and decision points.",
+      "execute": "Finding-based actions such as documenting results, remediation, escalation, detection tuning, reporting, or incident response.",
+      "review": "Lessons learned and improvements to detections, controls, telemetry, documentation, playbooks, and future hunt cards."
+    }
+  },
+  "mitre_attack": [
+    {
+      "id": "T1566",
+      "name": "Phishing",
+      "tactic": "Initial Access"
+    }
+  ],
+  "categories": [
+    "Initial Access",
+    "Email"
+  ],
+  "image": "CHASER-0003-phishing-email-investigation.png",
+  "json": "json/CHASER-0003-phishing-email-investigation.json",
+  "tool_requirements": [
+    {
+      "category": "EMAIL",
+      "capabilities": [
+        "message_trace",
+        "header_analysis",
+        "attachment_lookup",
+        "url_lookup"
+      ]
+    },
+    {
+      "category": "IDENTITY",
+      "capabilities": [
+        "sign_in_log_query",
+        "user_activity_query"
+      ]
+    },
+    {
+      "category": "SIEM",
+      "capabilities": [
+        "log_query",
+        "correlation_search"
+      ]
+    },
+    {
+      "category": "EDR",
+      "capabilities": [
+        "process_search",
+        "file_search"
+      ]
+    },
+    {
+      "category": "DNS",
+      "capabilities": [
+        "domain_lookup_history"
+      ]
+    },
+    {
+      "category": "NETWORK",
+      "capabilities": [
+        "url_connection_search"
+      ]
+    }
+  ],
+  "content": {
+    "threat_summary": "Phishing Email Investigation: Suspicious Email, Links, and Attachments",
+    "context": [
+      "Phishing uses electronically delivered social engineering to deliver links, attachments, credential lures, or instructions that lead to compromise.",
+      "Common evidence includes suspicious sender domains, failed SPF/DKIM/DMARC, lookalike URLs, malicious attachments, QR codes, unusual reply-to addresses, and credential harvesting pages.",
+      "Investigation usually starts from a reported message, sender, subject, Message-ID, URL, attachment hash, or affected recipient.",
+      "Primary mapping: MITRE ATT&CK T1566."
+    ],
+    "hypothesis": [
+      "A phishing message reached one or more users and may have resulted in link clicks, attachment execution, credential submission, mailbox activity, or endpoint execution."
+    ],
+    "analyze": [
+      "Reported message artifacts: full headers, Message-ID, sender, envelope sender, Reply-To, recipients, delivery action, timestamps, subject, source IP, authentication results, URLs, QR content, attachments, and hashes.",
+      "Campaign scope telemetry: message trace, email gateway logs, quarantine, junk, and block events, mail audit logs, URL rewriting or click telemetry, and sandbox or detonation results.",
+      "User interaction evidence: URL click events, proxy and DNS requests, attachment download or open signals, endpoint file and process activity, and credential submission indicators when available.",
+      "Downstream compromise evidence: identity sign-ins, MFA activity, risky sign-in signals, mailbox rule or forwarding changes, OAuth consent, EDR detections, persistence, and command-and-control connections.",
+      "Visibility gaps to call out: expired message trace, missing click telemetry, encrypted or sandbox-skipping attachments, unmanaged endpoints, absent DNS or proxy logs, or incomplete mailbox auditing."
+    ],
+    "strategize": [
+      "Scope the hunt to the reported message, a 14-day lookback, and a 72-hour post-delivery window across email, identity, EDR, DNS, proxy, and web telemetry.",
+      "Build search logic from sender, envelope sender, Reply-To, subject, Message-ID, source IP, URL domains, full URLs, QR-derived URLs, filenames, and attachment hashes.",
+      "Pivot from delivered messages to recipients, then to URL clicks, attachment execution, credential-entry indicators, anomalous sign-ins, mailbox changes, endpoint child processes, and network callbacks.",
+      "Enrich domains, URLs, attachments, and sender infrastructure with reputation, sandbox, registration age, redirect chain, and authentication results; separate benign bulk mail and expected vendors as false positives.",
+      "Use decision points to classify no evidence, exposure only, suspicious activity, confirmed compromise, or telemetry gap, then route to execute actions."
+    ],
+    "execute": {
+      "prevention": [
+        "Strengthen SPF, DKIM, DMARC alignment, impersonation controls, user reporting, URL detonation, attachment sandboxing, and QR-code URL analysis.",
+        "Tune email filtering for confirmed sender domains, URLs, attachments, authentication failures, lookalike domains, and post-click behaviors; test before enforcement.",
+        "Preserve malicious samples, headers, and click artifacts; recommend approved quarantine, purge, credential reset, or session revocation workflows when warranted."
+      ],
+      "escalation": [
+        "Escalate to incident response when a recipient clicked, executed an attachment, submitted credentials, or shows suspicious identity, mailbox, or endpoint activity after delivery.",
+        "Escalate confirmed credential theft, malicious mailbox rule or forwarding, malware execution, OAuth abuse, or command-and-control connection as confirmed compromise.",
+        "Escalate material telemetry gaps that prevent determining interaction or compromise for high-risk recipients."
+      ],
+      "finding_actions": [
+        {
+          "finding": "no evidence",
+          "action": "Document the indicators searched, data sources checked, time window, and negative results; close as no evidence unless new indicators appear."
+        },
+        {
+          "finding": "exposure only",
+          "action": "Report delivered or quarantined scope with no interaction; recommend approved message removal, filter tuning, user notification, and continued monitoring for late clicks."
+        },
+        {
+          "finding": "suspicious activity",
+          "action": "Escalate for triage, preserve headers and samples, enrich indicators, review impacted accounts and endpoints, and recommend containment through approved response owners."
+        },
+        {
+          "finding": "confirmed compromise",
+          "action": "Open or update incident response, identify affected users and hosts, recommend credential reset and session revocation, mailbox rule cleanup, endpoint containment, and detection deployment."
+        },
+        {
+          "finding": "telemetry gap",
+          "action": "Document the missing logs or retention limits, state the confidence impact, request the required data source or control improvement, and avoid overstating absence of compromise."
+        }
+      ]
+    },
+    "review": [
+      "Capture lessons about initial indicators, campaign scope, affected users, interaction paths, and downstream activity that changed the hunt outcome.",
+      "Record which controls detected, blocked, quarantined, or missed the campaign, and what tuning or policy changes would reduce repeat exposure.",
+      "Improve detections for sender, domain, URL, attachment hash, authentication failure, URL click, anomalous sign-in, mailbox rule, and attachment execution behaviors.",
+      "Document telemetry gaps, retention limits, or ownership issues that reduced confidence, then assign follow-up improvements.",
+      "Revise card pivots, time windows, false positives, enrichment sources, and report fields based on observed phishing patterns."
+    ]
+  },
+  "llm_instructions": {
+    "plain_language": "Treat the phishing hunt as a campaign scoping exercise. Start from the reported message or indicators, find all recipients, then determine who interacted and whether interaction led to identity or endpoint compromise.",
+    "hunt_goal": "Determine delivery scope, user interaction, and any confirmed downstream compromise from a suspected phishing message.",
+    "constraints": [
+      "Read-only actions only.",
+      "Do not purge, quarantine, or delete email.",
+      "Do not reset credentials or revoke sessions.",
+      "Clearly distinguish delivery, interaction, and compromise."
+    ],
+    "report_expectations": [
+      "Campaign scope",
+      "Affected recipients",
+      "User interactions",
+      "Credential or malware evidence",
+      "Controls performance",
+      "Recommended disposition"
+    ],
+    "hunt_guidance": {
+      "what_to_look_for": "A suspicious inbound message (lookalike/spoofed sender, failed SPF/DKIM/DMARC, malicious URL or attachment) that was delivered to one or more recipients and is followed by user interaction — a URL click, attachment execution, or credential submission — and, in the worst case, downstream identity or endpoint compromise.",
+      "key_entities": [
+        "sender address and sender domain (From, envelope/Return-Path, Reply-To)",
+        "recipient address(es)",
+        "subject line",
+        "Message-ID and originating/source IP",
+        "embedded URL and URL domain (including redirector/landing domain)",
+        "attachment filename and file hash (SHA256/MD5)",
+        "authentication results (SPF/DKIM/DMARC)",
+        "affected user account and the endpoint that interacted"
+      ],
+      "indicators": [
+        "sender domain is a lookalike/typosquat or newly registered, or display name spoofs a trusted brand or internal person",
+        "SPF, DKIM, or DMARC failure with a mismatched From/Return-Path/Reply-To",
+        "URLs pointing to credential-harvesting landing pages, link redirectors, or domains mimicking login portals (e.g. fake Microsoft 365/Okta sign-in)",
+        "attachments such as HTML smuggling files, password-protected archives, macro-enabled Office docs, OneNote, ISO/IMG, LNK, or script files",
+        "QR codes or embedded images used to deliver the malicious link (quishing)",
+        "user clicked the URL or opened/executed the attachment per mail or proxy/EDR telemetry",
+        "credential submission to the landing page followed by a successful sign-in from an unusual IP/geo/device",
+        "post-delivery mailbox changes such as new inbox/forwarding rules, or endpoint process spawned from an email attachment"
+      ],
+      "search_terms": [
+        "phishing",
+        "spoof",
+        "lookalike",
+        "credential harvest",
+        "login page",
+        "sign in",
+        "password",
+        "reset",
+        "invoice",
+        "docusign",
+        "shared document",
+        "voicemail",
+        "quarantine",
+        "spf fail",
+        "dkim fail",
+        "dmarc fail",
+        "reply-to",
+        "url click",
+        "attachment",
+        "quishing",
+        "html smuggling"
+      ],
+      "data_sources": [
+        "email gateway / secure email gateway logs",
+        "mail audit and message trace logs",
+        "URL click / safe-link detonation telemetry",
+        "web proxy and DNS logs",
+        "identity / authentication and sign-in logs",
+        "EDR process and file telemetry on recipient endpoints",
+        "mailbox audit logs (rule creation, forwarding, access)"
+      ],
+      "investigation_strategy": [
+        "Start from the reported message or initial indicator and extract its full pivot set: sender, sender domain, Reply-To/Return-Path, subject, Message-ID, source IP, URLs/domains, and attachment hashes.",
+        "Use message trace to scope the campaign — find all similar messages by sender, subject, Message-ID, URL, or attachment hash, and enumerate every recipient and delivery status (delivered, junked, quarantined, blocked).",
+        "Review authentication results (SPF/DKIM/DMARC) and header anomalies to gauge spoofing and legitimacy.",
+        "For delivered messages, determine interaction: who clicked URLs, opened/downloaded attachments, or reached the landing domain per URL-click, proxy, DNS, and EDR telemetry.",
+        "For users who interacted, correlate with identity sign-in logs (anomalous IP/geo/device, MFA prompts, successful logins) and mailbox audit logs (new forwarding/inbox rules) to detect credential theft or mailbox compromise.",
+        "For attachment opens, correlate with EDR for child processes, dropped files, persistence, or C2 network connections.",
+        "Separate delivered-only messages from confirmed interaction and from confirmed downstream compromise."
+      ],
+      "confirming_signals": [
+        "A delivered phishing message where a recipient clicked the malicious URL or executed the attachment, plus corroborating downstream activity such as credential submission, an anomalous successful sign-in, a malicious mailbox rule, or attachment-spawned process/C2 on the endpoint."
+      ],
+      "refuting_signals": [
+        "The message was blocked or quarantined before delivery and no user interaction occurred.",
+        "Authentication passed and the sender/domain is legitimate and expected for the recipients (false positive).",
+        "Recipients reported the message without clicking, and no click/open/credential-submission or downstream identity/endpoint activity is found.",
+        "The flagged URL/attachment is benign on detonation/sandbox review."
+      ],
+      "priority_assets": [
+        "recipients who clicked the URL, opened the attachment, or submitted credentials",
+        "accounts showing anomalous sign-ins or new mailbox/forwarding rules after delivery",
+        "high-value targets (executives, finance, IT/admin, helpdesk) and shared mailboxes",
+        "endpoints that executed attachments or reached the landing/C2 domain"
+      ],
+      "conclusion_criteria": "Conclude once you can state the campaign's delivery scope (all messages and recipients), which recipients interacted (clicked, opened, or submitted credentials), whether any interaction led to confirmed identity or endpoint compromise, and how controls performed — or that email/identity/endpoint logs cannot prove interaction or compromise (telemetry gap)."
+    }
+  },
+  "execution_plan": {
+    "context": [
+      "Summarize the threat and identify the affected platforms, techniques, and likely evidence sources.",
+      "Confirm whether the hunt scope and configured tools can support the card."
+    ],
+    "hypothesis": [
+      "Restate the hypothesis in the context of the selected workspace, time window, and scoped assets/users.",
+      "Identify what evidence would confirm, weaken, or disprove the hypothesis."
+    ],
+    "analyze": [
+      "Inventory the available evidence for the reported message: headers, message trace, sender and authentication details, recipients, delivery action, URLs, attachments, hashes, and timestamps.",
+      "Identify telemetry that can confirm, weaken, or disprove interaction and compromise: URL clicks, proxy and DNS events, identity sign-ins, MFA activity, mailbox audit, OAuth consent, EDR process and file events, and network connections.",
+      "Record visibility gaps that limit confidence, such as expired trace data, missing click telemetry, unmanaged endpoints, absent DNS or proxy logs, or incomplete mailbox auditing."
+    ],
+    "strategize": [
+      "Define the hunt scope, time window, affected mail systems, recipients, groups, and related identity, endpoint, DNS, proxy, and web technologies before querying.",
+      "Write search logic from message and campaign indicators; expand by sender, envelope sender, Reply-To, subject, Message-ID, source IP, URL, URL domain, QR-derived URL, filename, and attachment hash.",
+      "Pivot from delivery to user interaction, identity anomalies, mailbox changes, endpoint execution, and network activity; enrich indicators and note expected vendor or bulk-mail false positives.",
+      "Set decision points for no evidence, exposure only, suspicious activity, confirmed compromise, and telemetry gap."
+    ],
+    "execute": [
+      "Map each finding to the card finding_actions and recommend documentation, remediation, escalation, detection tuning, reporting, or incident response steps.",
+      "Escalate only through report recommendations; do not execute destructive or modifying actions."
+    ],
+    "review": [
+      "Summarize what the hunt proved or could not prove about delivery, interaction, credential theft, malware execution, and control performance.",
+      "Capture detection, control, documentation, and telemetry improvements needed after the hunt.",
+      "Update future card guidance when time windows, pivots, enrichment, false positives, or report fields need refinement."
+    ]
+  },
+  "query_examples": {
+    "splunk_spl": [
+      "index=email (sender_domain=\"example.com\" OR subject=\"Suspicious Subject\" OR url_domain=\"example.tld\") | stats count by recipient, action, subject",
+      "index=proxy url_domain=\"example.tld\" | stats count by user, src_ip, url"
+    ],
+    "sentinel_kql": [
+      "EmailEvents | where SenderFromDomain =~ \"example.com\" or Subject has \"Suspicious Subject\" | summarize count() by RecipientEmailAddress, DeliveryAction",
+      "UrlClickEvents | where Url has \"example.tld\" | project TimeGenerated, AccountUpn, Url, ActionType"
+    ],
+    "elastic_lucene": [
+      "event.dataset:email AND (email.from.address:* OR email.subject:*)"
+    ]
+  },
+  "safety_constraints": {
+    "read_only": true,
+    "blocked_actions": [
+      "delete",
+      "quarantine",
+      "isolate",
+      "disable_user",
+      "reset_password",
+      "revoke_session",
+      "modify_policy",
+      "remediate",
+      "block_ip",
+      "send_email",
+      "purge_email",
+      "active_exploitation"
+    ],
+    "privacy_note": "Use workspace privacy settings. Do not include secrets in prompts, logs, reports, or debug output."
+  },
+  "report_expectations": [
+    "Campaign scope",
+    "Affected recipients",
+    "User interactions",
+    "Credential or malware evidence",
+    "Controls performance",
+    "Recommended disposition"
+  ],
+  "references": [
+    {
+      "title": "MITRE ATT&CK T1566: Phishing",
+      "url": "https://attack.mitre.org/techniques/T1566/"
+    },
+    {
+      "title": "Microsoft Learn: Phishing Investigation",
+      "url": "https://learn.microsoft.com/en-us/security/operations/incident-response-playbook-phishing"
+    },
+    {
+      "title": "CISA/NSA/FBI/MS-ISAC Phishing Guidance",
+      "url": "https://media.defense.gov/2023/Oct/18/2003322402/-1/-1/1/CSI-PHISHING-GUIDANCE.PDF"
+    }
+  ]
+}

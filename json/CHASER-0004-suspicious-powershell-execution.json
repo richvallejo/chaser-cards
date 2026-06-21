@@ -1,0 +1,331 @@
+{
+  "$schema": "./chaser-card.schema.json",
+  "id": "CHASER-0004",
+  "slug": "suspicious-powershell-execution",
+  "title": "Suspicious PowerShell Execution",
+  "subtitle": "Command and Scripting Interpreter Abuse",
+  "version": "1.0.0",
+  "status": "active",
+  "created": "2026-06-19",
+  "updated": "2026-06-21",
+  "author": {
+    "name": "Richard Vallejo",
+    "website": "https://richardvallejo.com"
+  },
+  "license": "CC BY 4.0",
+  "branding": {
+    "series": "CHASER Cards",
+    "repository": "https://github.com/richvallejo/chaser-cards"
+  },
+  "chaser_model": {
+    "version": "2026-06-18",
+    "source": "https://richardvallejo.com/chaser.html",
+    "stage_questions": {
+      "context": "What are we hunting for, and why does it matter?",
+      "hypothesis": "What do we believe may be happening in the environment?",
+      "analyze": "What evidence do we need to examine?",
+      "strategize": "How are we going to run the hunt?",
+      "execute": "What do we do with what we found?",
+      "review": "What did we learn, and what should change?"
+    },
+    "stage_purposes": {
+      "context": "Relevant CVEs, techniques, affected systems, known behaviors, likely impact, and indicators.",
+      "hypothesis": "A testable statement that identifies likely behavior, affected environment, and evidence that would support or challenge the hunt.",
+      "analyze": "Telemetry and evidence sources needed to confirm, weaken, or disprove the hypothesis, including visibility gaps.",
+      "strategize": "Scope, time window, affected assets, search logic, pivots, enrichment, expected results, false positives, and decision points.",
+      "execute": "Finding-based actions such as documenting results, remediation, escalation, detection tuning, reporting, or incident response.",
+      "review": "Lessons learned and improvements to detections, controls, telemetry, documentation, playbooks, and future hunt cards."
+    }
+  },
+  "mitre_attack": [
+    {
+      "id": "T1059.001",
+      "name": "PowerShell",
+      "tactic": "Execution"
+    }
+  ],
+  "categories": [
+    "Execution",
+    "Endpoint"
+  ],
+  "image": "CHASER-0004-suspicious-powershell-execution.png",
+  "json": "json/CHASER-0004-suspicious-powershell-execution.json",
+  "tool_requirements": [
+    {
+      "category": "EDR",
+      "capabilities": [
+        "process_search",
+        "command_line_search",
+        "file_search"
+      ]
+    },
+    {
+      "category": "SIEM",
+      "capabilities": [
+        "log_query",
+        "windows_event_query"
+      ]
+    },
+    {
+      "category": "ENDPOINT_ASSET_INVENTORY",
+      "capabilities": [
+        "asset_inventory"
+      ]
+    },
+    {
+      "category": "DNS",
+      "capabilities": [
+        "domain_lookup_history"
+      ]
+    },
+    {
+      "category": "NETWORK",
+      "capabilities": [
+        "outbound_connection_search"
+      ]
+    }
+  ],
+  "content": {
+    "threat_summary": "Suspicious PowerShell Execution: Command and Scripting Interpreter Abuse",
+    "context": [
+      "Adversaries abuse PowerShell to execute code, download payloads, perform discovery, evade defenses, and run fileless or script-based tradecraft.",
+      "Useful telemetry includes EDR process events, command line, parent/child process lineage, PowerShell Script Block Logging, Module Logging, and Windows event logs.",
+      "Indicators: -EncodedCommand, hidden windows, bypass flags, web downloads, Invoke-Expression, suspicious base64, unusual parent processes, and outbound connections.",
+      "Primary mapping: MITRE ATT&CK T1059.001."
+    ],
+    "hypothesis": [
+      "A host executed suspicious PowerShell commands that may indicate malicious script execution, payload download, defense evasion, discovery, or post-exploitation activity."
+    ],
+    "analyze": [
+      "Confirm EDR or process telemetry includes powershell.exe and pwsh.exe events with full command line, parent/child lineage, host, user, and timestamp fields.",
+      "Confirm PowerShell Script Block Logging (4104), Module Logging (4103), Windows 4688, or Sysmon process data is available for the scoped hosts and retention window.",
+      "Confirm DNS, proxy, firewall, EDR network, and file telemetry can link PowerShell execution to outbound URLs, domains, IPs, downloads, and file writes.",
+      "Identify visibility gaps such as missing command-line capture, disabled script block logging, unmanaged endpoints, weak asset context, or insufficient log retention."
+    ],
+    "strategize": [
+      "Scope Windows endpoints and servers across the selected time window, prioritizing high-privilege users, servers, unusual parents, and direct external egress.",
+      "Query for powershell.exe or pwsh.exe with high-risk flags and functions: EncodedCommand, -enc, bypass, hidden, noninteractive, IEX, DownloadString, Invoke-WebRequest, BITS, FromBase64String, Add-Type, or reflection.",
+      "Pivot from each hit to parent/child process lineage, decoded or script-block content, file writes, scheduled tasks, registry changes, DNS lookups, proxy events, and firewall connections around the execution time.",
+      "Use decision points to classify activity as known administration, exposure only, suspicious activity, confirmed compromise, or telemetry gap; enrich with asset criticality, user role, and known-good automation."
+    ],
+    "execute": {
+      "prevention": [
+        "Enable and centralize PowerShell Script Block Logging, Module Logging, command-line process auditing, and EDR PowerShell visibility where appropriate.",
+        "Use constrained language mode, application control, AMSI/EDR policy, and attack surface reduction rules to limit risky PowerShell execution paths.",
+        "Restrict PowerShell use to approved administrative workflows, signed scripts, monitored automation accounts, and managed administration hosts."
+      ],
+      "escalation": [
+        "Escalate to IR if decoded script content, process lineage, or correlated telemetry shows payload download or execution, reflective loading, credential access, persistence, lateral movement, or suspicious infrastructure.",
+        "Preserve command lines, script blocks, decoded content, host/user context, process lineage, network destinations, file hashes, and timestamps before response actions."
+      ],
+      "finding_actions": [
+        {
+          "finding": "no evidence",
+          "action": "Document scope, time window, telemetry reviewed, and absence of suspicious PowerShell execution; continue routine monitoring and retain the query set."
+        },
+        {
+          "finding": "exposure only",
+          "action": "Document hosts or users with risky PowerShell capability or weak controls but no suspicious activity; recommend hardening, logging, and policy tuning."
+        },
+        {
+          "finding": "suspicious activity",
+          "action": "Open an investigation ticket, collect decoded commands and correlated process/network/file evidence, tune detections, and monitor related hosts, users, and destinations."
+        },
+        {
+          "finding": "confirmed compromise",
+          "action": "Escalate to incident response with evidence summary, affected assets, user context, timeline, payloads, destinations, and recommended containment/remediation steps."
+        },
+        {
+          "finding": "telemetry gap",
+          "action": "Record the missing source, field, asset coverage, or retention gap; assign ownership to close the visibility issue before using a clean result as assurance."
+        }
+      ]
+    },
+    "review": [
+      "Capture which detections fired or missed encoded commands, suspicious parents, download cradles, obfuscation, and PowerShell-to-network behavior.",
+      "Record control improvements for logging coverage, AMSI/EDR policy, constrained language mode, application control, ASR rules, and administrative script governance.",
+      "Document telemetry gaps by source, field, asset group, retention, and owner so missing visibility becomes tracked improvement work.",
+      "Feed confirmed benign scripts, false positives, useful pivots, and outcome lessons back into detections, documentation, and future CHASER Card revisions."
+    ]
+  },
+  "llm_instructions": {
+    "plain_language": "Hunt for suspicious PowerShell execution by using command-line patterns, parent/child process behavior, script block logs, and correlated network/file activity. Separate legitimate administration from malicious or suspicious tradecraft.",
+    "hunt_goal": "Determine whether PowerShell activity reflects normal administration or malicious execution/post-exploitation behavior.",
+    "constraints": [
+      "Read-only actions only.",
+      "Do not execute, detonate, or reproduce suspicious scripts.",
+      "Do not decode or render secrets if they appear in script content beyond what is needed for reporting."
+    ],
+    "report_expectations": [
+      "Affected hosts",
+      "Users and parent processes",
+      "Suspicious command lines",
+      "Decoded script intent",
+      "Correlated network/file activity",
+      "Telemetry gaps"
+    ],
+    "hunt_guidance": {
+      "what_to_look_for": "A PowerShell process (powershell.exe/pwsh.exe) launched with obfuscated, encoded, or download-cradle command lines (e.g. -EncodedCommand, IEX(New-Object Net.WebClient).DownloadString) from an unusual parent, then making an outbound connection or spawning further payloads.",
+      "key_entities": [
+        "host / endpoint name",
+        "user / security context",
+        "parent process and full process lineage",
+        "PowerShell process (powershell.exe / pwsh.exe)",
+        "full command line and decoded script-block content",
+        "script / payload file path written to disk",
+        "remote URL, domain, and destination IP contacted",
+        "child processes spawned by PowerShell"
+      ],
+      "indicators": [
+        "-EncodedCommand / -enc / -e with a long base64 string",
+        "Invoke-Expression / IEX of downloaded or decoded content",
+        "Net.WebClient.DownloadString / DownloadFile / Invoke-WebRequest / Start-BitsTransfer download cradles",
+        "FromBase64String, -join, char/format-string obfuscation, GzipStream/DeflateStream decompression",
+        "execution policy bypass (-ExecutionPolicy Bypass / -ep bypass) and hidden window (-WindowStyle Hidden / -w hidden / -NonInteractive / -NoProfile)",
+        "PowerShell spawned by Office apps, browsers, wscript/cscript/mshta, archive tools, or unexpected services",
+        "reflective loading (System.Reflection.Assembly.Load, [Reflection.Assembly], VirtualAlloc, Add-Type) for fileless execution",
+        "use of LOLBins or downgrade to powershell -Version 2 to evade logging",
+        "PowerShell process making direct outbound network connections to rare or newly seen domains"
+      ],
+      "search_terms": [
+        "powershell",
+        "pwsh",
+        "encodedcommand",
+        "-enc",
+        "invoke-expression",
+        "iex",
+        "downloadstring",
+        "downloadfile",
+        "invoke-webrequest",
+        "net.webclient",
+        "frombase64string",
+        "bypass",
+        "hidden",
+        "noprofile",
+        "reflection.assembly",
+        "add-type",
+        "scriptblock",
+        "obfuscated",
+        "base64"
+      ],
+      "data_sources": [
+        "EDR process and command-line telemetry",
+        "PowerShell Script Block Logging (Event ID 4104) and Module Logging (4103)",
+        "Windows process creation events (Event ID 4688 / Sysmon Event ID 1) with command-line auditing",
+        "DNS query logs",
+        "network / proxy outbound connection logs",
+        "file creation and endpoint asset inventory telemetry"
+      ],
+      "investigation_strategy": [
+        "Search process telemetry for powershell.exe/pwsh.exe across the window and surface high-signal command-line patterns (encoded, download cradles, bypass/hidden flags).",
+        "For each hit, capture the full command line and pull the parent/child process lineage to spot suspicious parents (Office, browsers, scripting hosts, archives, services).",
+        "Decode any base64/EncodedCommand and review Script Block Logging (4104) to recover and assess the actual script intent.",
+        "Correlate the execution timestamp with DNS lookups, outbound connections, and file writes to identify payload retrieval and dropped artifacts.",
+        "Pivot on the contacted domains/IPs and any spawned child processes to find persistence, credential access, or lateral movement, and check whether the activity recurs across other hosts.",
+        "Compare the host, user, and command against known administrative scripts, automation accounts, and software-deployment baselines."
+      ],
+      "confirming_signals": [
+        "A decoded or script-block-logged PowerShell command that downloads and executes remote code, loads a payload reflectively, or contacts attacker infrastructure.",
+        "PowerShell launched by an anomalous parent (e.g. Word, Excel, mshta, wscript) followed by outbound connection or child-process spawn.",
+        "Encoded/obfuscated command line tied to a file write, persistence change, or credential-access activity in the same window."
+      ],
+      "refuting_signals": [
+        "Command lines map to known administrative scripts, signed management tooling, or software-deployment/automation accounts.",
+        "Encoded commands decode to benign, expected configuration or inventory tasks.",
+        "PowerShell launched by an expected parent (management agent, scheduler) on the normal baseline for that host/user."
+      ],
+      "priority_assets": [
+        "hosts where PowerShell was spawned by Office apps, browsers, or scripting hosts",
+        "servers and domain controllers",
+        "endpoints with outbound connections immediately following PowerShell execution",
+        "high-privilege or administrative user contexts"
+      ],
+      "conclusion_criteria": "Conclude once you can state, per flagged PowerShell execution, whether it represents malicious/suspicious tradecraft (decoded intent, anomalous parent, payload download or follow-on activity) or benign administration — or that script-block/command-line telemetry is unavailable to determine intent (telemetry gap)."
+    }
+  },
+  "execution_plan": {
+    "context": [
+      "Summarize the threat and identify the affected platforms, techniques, and likely evidence sources.",
+      "Confirm whether the hunt scope and configured tools can support the card."
+    ],
+    "hypothesis": [
+      "Restate the hypothesis in the context of the selected workspace, time window, and scoped assets/users.",
+      "Identify what evidence would confirm, weaken, or disprove the hypothesis."
+    ],
+    "analyze": [
+      "Validate that EDR/process telemetry contains full command line, parent/child lineage, host, user, and timestamp fields for powershell.exe and pwsh.exe.",
+      "Validate availability and retention for PowerShell Script Block Logging 4104, Module Logging 4103, Windows 4688, Sysmon Event ID 1, and EDR process data.",
+      "Validate DNS, proxy, firewall, EDR network, and file telemetry needed to correlate PowerShell execution with downloads, outbound connections, and file writes.",
+      "Record visibility limits before drawing conclusions, including missing fields, disabled logging, incomplete endpoint coverage, or retention gaps."
+    ],
+    "strategize": [
+      "Define the scoped Windows assets, user populations, administrative automation paths, and time window before running searches.",
+      "Run high-signal query logic for PowerShell flags, obfuscation, download cradles, encoded content, reflection, and unusual parent processes.",
+      "Pivot from each result into decoded/script-block content, process lineage, DNS/proxy/firewall events, file writes, scheduled tasks, registry changes, and related hosts or users.",
+      "Apply decision points for known administration, exposure only, suspicious activity, confirmed compromise, and telemetry gap; enrich findings with asset criticality and user role."
+    ],
+    "execute": [
+      "Map the finding category to the appropriate action: document no evidence, harden exposure, investigate suspicious activity, escalate confirmed compromise, or track telemetry gaps.",
+      "Preserve evidence and make report recommendations only; do not execute destructive, containment, or remediation actions from this hunt card."
+    ],
+    "review": [
+      "Capture what the hunt taught about detections, controls, visibility, false positives, and administrative PowerShell baselines.",
+      "Create or tune detections for encoded commands, suspicious parentage, download cradles, obfuscation, and PowerShell-to-network patterns.",
+      "Track logging, retention, and endpoint coverage gaps to accountable owners.",
+      "Update documentation and future CHASER Card guidance with useful pivots, lessons learned, and card-specific improvement ideas."
+    ]
+  },
+  "query_examples": {
+    "splunk_spl": [
+      "index=edr process_name IN (\"powershell.exe\",\"pwsh.exe\") (command_line=\"*-enc*\" OR command_line=\"*EncodedCommand*\" OR command_line=\"*IEX*\" OR command_line=\"*DownloadString*\")",
+      "index=wineventlog EventCode=4104 (\"Invoke-Expression\" OR \"DownloadString\" OR \"FromBase64String\" OR \"EncodedCommand\")"
+    ],
+    "sentinel_kql": [
+      "DeviceProcessEvents | where FileName in~ (\"powershell.exe\",\"pwsh.exe\") | where ProcessCommandLine has_any (\"-enc\",\"EncodedCommand\",\"IEX\",\"DownloadString\",\"FromBase64String\",\"Bypass\")",
+      "Event | where EventID == 4104 | where RenderedDescription has_any (\"Invoke-Expression\",\"DownloadString\",\"FromBase64String\",\"EncodedCommand\")"
+    ],
+    "elastic_lucene": [
+      "process.name:(powershell.exe OR pwsh.exe) AND process.command_line:(*EncodedCommand* OR *DownloadString* OR *IEX*)"
+    ]
+  },
+  "safety_constraints": {
+    "read_only": true,
+    "blocked_actions": [
+      "delete",
+      "quarantine",
+      "isolate",
+      "disable_user",
+      "reset_password",
+      "revoke_session",
+      "modify_policy",
+      "remediate",
+      "block_ip",
+      "send_email",
+      "purge_email",
+      "active_exploitation"
+    ],
+    "privacy_note": "Use workspace privacy settings. Do not include secrets in prompts, logs, reports, or debug output."
+  },
+  "report_expectations": [
+    "Affected hosts",
+    "Users and parent processes",
+    "Suspicious command lines",
+    "Decoded script intent",
+    "Correlated network/file activity",
+    "Telemetry gaps"
+  ],
+  "references": [
+    {
+      "title": "MITRE ATT&CK T1059.001: PowerShell",
+      "url": "https://attack.mitre.org/techniques/T1059/001/"
+    },
+    {
+      "title": "Microsoft Learn: about_Logging_Windows",
+      "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_windows"
+    },
+    {
+      "title": "MITRE ATT&CK T1059: Command and Scripting Interpreter",
+      "url": "https://attack.mitre.org/techniques/T1059/"
+    }
+  ]
+}

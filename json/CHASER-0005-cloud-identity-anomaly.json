@@ -1,0 +1,340 @@
+{
+  "$schema": "./chaser-card.schema.json",
+  "id": "CHASER-0005",
+  "slug": "cloud-identity-anomaly",
+  "title": "Cloud Identity Anomaly",
+  "subtitle": "Suspicious SaaS or IdP Sign-In Behavior",
+  "version": "1.0.0",
+  "status": "active",
+  "created": "2026-06-19",
+  "updated": "2026-06-21",
+  "author": {
+    "name": "Richard Vallejo",
+    "website": "https://richardvallejo.com"
+  },
+  "license": "CC BY 4.0",
+  "branding": {
+    "series": "CHASER Cards",
+    "repository": "https://github.com/richvallejo/chaser-cards"
+  },
+  "chaser_model": {
+    "version": "2026-06-18",
+    "source": "https://richardvallejo.com/chaser.html",
+    "stage_questions": {
+      "context": "What are we hunting for, and why does it matter?",
+      "hypothesis": "What do we believe may be happening in the environment?",
+      "analyze": "What evidence do we need to examine?",
+      "strategize": "How are we going to run the hunt?",
+      "execute": "What do we do with what we found?",
+      "review": "What did we learn, and what should change?"
+    },
+    "stage_purposes": {
+      "context": "Relevant CVEs, techniques, affected systems, known behaviors, likely impact, and indicators.",
+      "hypothesis": "A testable statement that identifies likely behavior, affected environment, and evidence that would support or challenge the hunt.",
+      "analyze": "Telemetry and evidence sources needed to confirm, weaken, or disprove the hypothesis, including visibility gaps.",
+      "strategize": "Scope, time window, affected assets, search logic, pivots, enrichment, expected results, false positives, and decision points.",
+      "execute": "Finding-based actions such as documenting results, remediation, escalation, detection tuning, reporting, or incident response.",
+      "review": "Lessons learned and improvements to detections, controls, telemetry, documentation, playbooks, and future hunt cards."
+    }
+  },
+  "mitre_attack": [
+    {
+      "id": "T1078.004",
+      "name": "Valid Accounts: Cloud Accounts",
+      "tactic": "Initial Access / Persistence / Privilege Escalation / Defense Evasion"
+    }
+  ],
+  "categories": [
+    "Identity",
+    "Cloud"
+  ],
+  "image": "CHASER-0005-cloud-identity-anomaly.png",
+  "json": "json/CHASER-0005-cloud-identity-anomaly.json",
+  "tool_requirements": [
+    {
+      "category": "IDENTITY",
+      "capabilities": [
+        "sign_in_log_query",
+        "risky_user_query",
+        "audit_log_query",
+        "mfa_event_query"
+      ]
+    },
+    {
+      "category": "CLOUD",
+      "capabilities": [
+        "cloud_audit_log_query",
+        "admin_activity_query"
+      ]
+    },
+    {
+      "category": "SIEM",
+      "capabilities": [
+        "log_query",
+        "correlation_search"
+      ]
+    },
+    {
+      "category": "NETWORK",
+      "capabilities": [
+        "source_ip_analysis"
+      ]
+    },
+    {
+      "category": "ENDPOINT_ASSET_INVENTORY",
+      "capabilities": [
+        "asset_inventory"
+      ]
+    }
+  ],
+  "content": {
+    "threat_summary": "Cloud Identity Anomaly: Suspicious SaaS or IdP Sign-In Behavior",
+    "context": [
+      "Adversaries can use valid cloud accounts to access SaaS, identity providers, cloud consoles, or admin portals while blending into normal authentication activity.",
+      "Common indicators include impossible travel, unfamiliar sign-in properties, risky sign-ins, repeated MFA failures, new devices, legacy protocols, unusual apps, or suspicious admin actions.",
+      "Useful telemetry includes IdP sign-in logs, risky user/sign-in reports, audit logs, cloud admin activity, device context, and downstream mailbox or cloud resource activity.",
+      "Primary mapping: MITRE ATT&CK T1078.004."
+    ],
+    "hypothesis": [
+      "A valid cloud account may be compromised or misused, shown by anomalous sign-in behavior, suspicious MFA activity, unusual application access, or abnormal post-login actions."
+    ],
+    "analyze": [
+      "Validate IdP sign-in telemetry for interactive and non-interactive auth, failures, successes, risk detections, conditional access, MFA, device, app, and token details.",
+      "Confirm identity audit coverage for role/group changes, OAuth consent, app or service-principal changes, MFA method or device registration, and session actions.",
+      "Confirm downstream SaaS, mailbox, and cloud audit logs capture inbox rules, data access, admin activity, and resource changes after authentication.",
+      "Check retention, field quality, user/IP/device/app correlation IDs, known VPN/travel context, and gaps such as missing legacy auth or unmanaged-device visibility."
+    ],
+    "strategize": [
+      "Scope IdP/SaaS tenants, privileged and sensitive users, service accounts, and break-glass accounts for a 24-72 hour window around each anomaly.",
+      "Query high-risk sign-ins, failures, MFA events, rare app use, and legacy protocols; pivot by user, IP/ASN/geo, device, user agent, app, session ID, and policy result.",
+      "Correlate flagged sessions to role/group changes, OAuth consent, MFA/device registration, inbox rules, token/session changes, cloud admin actions, and data access.",
+      "Use VPN, travel, admin, and service-account baselines to reduce false positives; decide per account: benign, exposure only, suspicious, confirmed compromise, or telemetry gap."
+    ],
+    "execute": {
+      "prevention": [
+        "Use MFA, preferably phishing-resistant MFA, and enforce risk-based conditional access where available.",
+        "Disable legacy authentication, monitor service accounts, and restrict high-risk admin actions.",
+        "Review app consent, admin role assignment, token/session controls, and abnormal mailbox/cloud resource access."
+      ],
+      "escalation": [
+        "Escalate if suspicious sign-ins correlate with successful access, MFA manipulation, privilege changes, app consent, mailbox rule creation, or data access.",
+        "Treat high-confidence anomalous access to privileged or sensitive accounts as possible compromise."
+      ],
+      "finding_actions": [
+        {
+          "finding": "no evidence",
+          "action": "Document searches, coverage, negative results, and confidence; close as no evidence found when required telemetry was sufficient."
+        },
+        {
+          "finding": "exposure only",
+          "action": "Report exposed identity risk such as weak MFA, legacy auth, risky app consent, or broad access; recommend control remediation without declaring compromise."
+        },
+        {
+          "finding": "suspicious activity",
+          "action": "Escalate for analyst validation, preserve evidence, expand pivots across identity and downstream activity, and recommend approved response steps."
+        },
+        {
+          "finding": "confirmed compromise",
+          "action": "Open incident response, preserve evidence, assess downstream impact, and recommend account containment, credential reset, MFA reset, and app-consent cleanup through authorized responders."
+        },
+        {
+          "finding": "telemetry gap",
+          "action": "Record the missing logs, fields, retention, or enrichment; recommend telemetry onboarding or tuning and rerun the hunt when visibility exists."
+        }
+      ]
+    },
+    "review": [
+      "Document what confirmed, weakened, disproved, or blocked the hypothesis, including accounts, sign-ins, risk signals, pivots, and confidence.",
+      "Tune detections for impossible travel, MFA fatigue, success-after-failure, legacy auth, risky OAuth consent, role changes, inbox rules, and abnormal admin actions.",
+      "Improve controls: phishing-resistant MFA, conditional access, legacy auth blocking, app-consent governance, privileged monitoring, and service-account baselines.",
+      "Record telemetry gaps, validated false positives, useful queries, and decision criteria; update playbooks, reports, and future CHASER cards."
+    ]
+  },
+  "llm_instructions": {
+    "plain_language": "Hunt for cloud identity misuse by correlating sign-in anomalies with post-login actions. Do not call compromise based only on an unusual login; look for supporting evidence such as suspicious MFA, admin changes, app consent, mailbox rules, or data access.",
+    "hunt_goal": "Determine whether a cloud account is being misused or compromised based on identity risk and follow-on behavior.",
+    "constraints": [
+      "Read-only actions only.",
+      "Do not reset passwords, revoke sessions, disable accounts, or modify conditional access.",
+      "Contact/user verification must be treated as an external process, not performed by the agent."
+    ],
+    "report_expectations": [
+      "Risky accounts",
+      "Suspicious sign-ins",
+      "Post-login activity",
+      "Privilege/app/mailbox changes",
+      "Severity/confidence/disposition",
+      "Telemetry gaps"
+    ],
+    "hunt_guidance": {
+      "what_to_look_for": "An anomalous cloud sign-in (impossible travel, new country/ASN, risky sign-in, success-after-MFA-fatigue, or legacy-protocol auth) for a valid account that is followed by a sensitive post-login action such as a role/privilege assignment, OAuth app consent, inbox-rule creation, or new MFA/device registration.",
+      "key_entities": [
+        "user principal / account UPN",
+        "source IP and geo/ASN (residential vs hosting/VPS)",
+        "application / OAuth app and service principal",
+        "device ID, browser, and user agent",
+        "role / privilege or admin group assigned",
+        "sign-in / session / token (refresh token) ID",
+        "conditional access policy result"
+      ],
+      "indicators": [
+        "impossible travel between two sign-ins for the same user in a short window",
+        "first-time sign-in from a new country or hosting/VPS ASN never seen for that user",
+        "repeated MFA push prompts (prompt bombing) ending in a single approval",
+        "success-after-failure burst (password spray / brute force) from one source",
+        "legacy / basic authentication protocol used to bypass MFA",
+        "new OAuth application consent grant, especially with broad mail/files scopes",
+        "privileged role or admin group assignment shortly after a risky sign-in",
+        "new inbox forwarding/hiding rule, new MFA method, or new device registered post-login"
+      ],
+      "search_terms": [
+        "sign-in",
+        "sign in",
+        "login",
+        "impossible travel",
+        "risky sign-in",
+        "risky user",
+        "atypical travel",
+        "unfamiliar location",
+        "anonymous ip",
+        "mfa",
+        "multifactor",
+        "mfa fatigue",
+        "prompt bombing",
+        "legacy authentication",
+        "basic authentication",
+        "consent",
+        "oauth",
+        "service principal",
+        "app registration",
+        "add member to role",
+        "role assignment",
+        "inbox rule",
+        "conditional access",
+        "password spray",
+        "token",
+        "refresh token"
+      ],
+      "data_sources": [
+        "cloud / IdP sign-in logs (interactive and non-interactive)",
+        "identity risk reports (risky users, risky sign-ins)",
+        "identity audit logs (role changes, app consent, MFA/device registration)",
+        "OAuth / application consent and service principal sign-in logs",
+        "conditional access evaluation logs",
+        "mailbox / cloud resource audit logs (inbox rules, data access)",
+        "cloud control-plane audit logs (AWS CloudTrail, admin activity)"
+      ],
+      "investigation_strategy": [
+        "Enumerate risky users and risky/failed sign-ins across the window; list distinct users, source IPs, geos/ASNs, devices, and applications.",
+        "Flag sign-ins showing impossible travel, new country/hosting ASN, legacy-protocol auth, or success-after-failure/MFA-fatigue patterns.",
+        "For each flagged sign-in, pivot on the user principal to pull all sessions, tokens, devices, and applications used in the same time window.",
+        "Correlate the suspicious sign-in with identity audit and mailbox/cloud audit events (role assignment, OAuth consent, inbox rule, new MFA/device, data access) immediately after login.",
+        "Compare against the user's baseline, known VPN egress, business travel, sanctioned apps, and expected admin/service-account behavior to separate benign anomalies from compromise.",
+        "Confirm whether the anomalous access produced a real post-login impact, then assign severity and confidence."
+      ],
+      "confirming_signals": [
+        "An anomalous sign-in (impossible travel, new-country/ASN, MFA fatigue, or legacy auth) immediately followed by a privilege/role change, OAuth consent grant, inbox forwarding rule, new MFA/device registration, or sensitive data access for the same account."
+      ],
+      "refuting_signals": [
+        "The 'impossible travel' is explained by a known corporate VPN, proxy, or relay egress IP.",
+        "The new location matches documented business travel or the user's home region.",
+        "The OAuth app is sanctioned/admin-approved and the consent matches expected business use.",
+        "MFA prompts were satisfied normally with no fatigue pattern, and no sensitive post-login action occurred.",
+        "Activity is expected behavior of a known service account or automation from its usual source."
+      ],
+      "priority_assets": [
+        "privileged / global admin and other high-privilege accounts",
+        "executives and users with access to sensitive data",
+        "service principals, OAuth apps, and service/automation accounts",
+        "break-glass / emergency-access accounts"
+      ],
+      "conclusion_criteria": "Conclude once you can state, per flagged account, whether the anomalous sign-in is benign (VPN/travel/sanctioned app/service account) or shows likely misuse/compromise evidenced by a correlated sensitive post-login action — or that sign-in, identity-audit, or post-login telemetry is insufficient to determine authentication and follow-on state (telemetry gap)."
+    }
+  },
+  "execution_plan": {
+    "context": [
+      "Summarize the cloud identity risk, affected IdP/SaaS/cloud platforms, mapped ATT&CK technique, known behaviors, and why it matters.",
+      "Define in-scope tenants, account classes, applications, and expected evidence before any queries run."
+    ],
+    "hypothesis": [
+      "State a testable workspace-specific hypothesis with likely compromised-account behavior, scoped users/assets, time window, and expected evidence.",
+      "Define confirming, weakening, disproving, and telemetry-gap outcomes for the hypothesis."
+    ],
+    "analyze": [
+      "Confirm required data sources exist and cover the hunt window: IdP sign-in/risk logs, MFA events, conditional access, identity audit, SaaS/mailbox/cloud audit, and network/IP enrichment.",
+      "Validate field quality for user, IP/geo/ASN, device, app, client, user agent, session/correlation ID, policy result, and downstream action fields.",
+      "Identify retention, ingestion, licensing, privacy redaction, unmanaged-device, legacy-auth, and non-interactive sign-in visibility gaps.",
+      "Record which conclusions each data source can or cannot support before drawing compromise judgments."
+    ],
+    "strategize": [
+      "Set scope and time window, prioritizing privileged/sensitive users, service accounts, break-glass accounts, risky sign-ins, and sensitive applications.",
+      "Define query logic for impossible travel, first-seen country/ASN, MFA failures followed by success, legacy auth, unfamiliar device/browser, rare app use, and denied-to-success patterns.",
+      "Plan pivots from sign-in to user, IP/ASN/geo, device, user agent, app/client, session/correlation ID, OAuth app, conditional access, and downstream audit events.",
+      "Define enrichment, false-positive handling, expected results, and decision points for benign, exposure only, suspicious activity, confirmed compromise, and telemetry gap."
+    ],
+    "execute": [
+      "Map each finding to the card's finding_actions disposition and include severity, confidence, owner, and recommended action in the report.",
+      "Recommend remediation or incident response through approved processes; do not execute account, session, policy, or blocking changes.",
+      "Escalate confirmed compromise or high-confidence suspicious activity with supporting sign-in, MFA, audit, and downstream evidence."
+    ],
+    "review": [
+      "Document what confirmed, weakened, disproved, or blocked the hypothesis, including accounts, sign-ins, risk signals, pivots, and confidence.",
+      "Record telemetry gaps, validated false positives, useful queries, and decision criteria for future hunts.",
+      "Tune detections and improve controls for the validated cloud identity behaviors.",
+      "Update identity response playbooks, reports, and this CHASER Card with lessons learned."
+    ]
+  },
+  "query_examples": {
+    "splunk_spl": [
+      "index=cloud_identity (risk_level=high OR risk_state=atRisk OR action=failure) | stats count by user, src_ip, app, country",
+      "index=cloud_audit (operation=\"Add member to role\" OR operation=\"Consent to application\" OR operation=\"New-InboxRule\") | stats count by user, operation, src_ip"
+    ],
+    "sentinel_kql": [
+      "SigninLogs | where RiskLevelDuringSignIn in (\"medium\",\"high\") or ResultType != 0 | project TimeGenerated, UserPrincipalName, IPAddress, Location, AppDisplayName, RiskLevelDuringSignIn, ResultType",
+      "AuditLogs | where OperationName has_any (\"Add member to role\",\"Consent to application\",\"Add service principal\",\"New-InboxRule\") | project TimeGenerated, InitiatedBy, OperationName, TargetResources"
+    ],
+    "elastic_lucene": [
+      "event.category:authentication AND (event.outcome:failure OR risk.level:(medium OR high))"
+    ]
+  },
+  "safety_constraints": {
+    "read_only": true,
+    "blocked_actions": [
+      "delete",
+      "quarantine",
+      "isolate",
+      "disable_user",
+      "reset_password",
+      "revoke_session",
+      "modify_policy",
+      "remediate",
+      "block_ip",
+      "send_email",
+      "purge_email",
+      "active_exploitation"
+    ],
+    "privacy_note": "Use workspace privacy settings. Do not include secrets in prompts, logs, reports, or debug output."
+  },
+  "report_expectations": [
+    "Risky accounts",
+    "Suspicious sign-ins",
+    "Post-login activity",
+    "Privilege/app/mailbox changes",
+    "Severity/confidence/disposition",
+    "Telemetry gaps"
+  ],
+  "references": [
+    {
+      "title": "MITRE ATT&CK T1078.004: Valid Accounts - Cloud Accounts",
+      "url": "https://attack.mitre.org/techniques/T1078/004/"
+    },
+    {
+      "title": "MITRE ATT&CK DET0560: Detection of Valid Account Abuse",
+      "url": "https://attack.mitre.org/detectionstrategies/DET0560/"
+    },
+    {
+      "title": "Microsoft Learn: Investigate Risk with Microsoft Entra ID Protection",
+      "url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-investigate-risk"
+    }
+  ]
+}

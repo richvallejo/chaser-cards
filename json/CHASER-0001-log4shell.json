@@ -1,0 +1,327 @@
+{
+  "$schema": "./chaser-card.schema.json",
+  "id": "CHASER-0001",
+  "slug": "log4shell",
+  "title": "Log4Shell",
+  "subtitle": "Apache Log4j JNDI Exploitation",
+  "version": "1.0.0",
+  "status": "active",
+  "created": "2026-06-19",
+  "updated": "2026-06-21",
+  "author": {
+    "name": "Richard Vallejo",
+    "website": "https://richardvallejo.com"
+  },
+  "license": "CC BY 4.0",
+  "branding": {
+    "series": "CHASER Cards",
+    "repository": "https://github.com/richvallejo/chaser-cards"
+  },
+  "chaser_model": {
+    "version": "2026-06-18",
+    "source": "https://richardvallejo.com/chaser.html",
+    "stage_questions": {
+      "context": "What are we hunting for, and why does it matter?",
+      "hypothesis": "What do we believe may be happening in the environment?",
+      "analyze": "What evidence do we need to examine?",
+      "strategize": "How are we going to run the hunt?",
+      "execute": "What do we do with what we found?",
+      "review": "What did we learn, and what should change?"
+    },
+    "stage_purposes": {
+      "context": "Relevant CVEs, techniques, affected systems, known behaviors, likely impact, and indicators.",
+      "hypothesis": "A testable statement that identifies likely behavior, affected environment, and evidence that would support or challenge the hunt.",
+      "analyze": "Telemetry and evidence sources needed to confirm, weaken, or disprove the hypothesis, including visibility gaps.",
+      "strategize": "Scope, time window, affected assets, search logic, pivots, enrichment, expected results, false positives, and decision points.",
+      "execute": "Finding-based actions such as documenting results, remediation, escalation, detection tuning, reporting, or incident response.",
+      "review": "Lessons learned and improvements to detections, controls, telemetry, documentation, playbooks, and future hunt cards."
+    }
+  },
+  "mitre_attack": [
+    {
+      "id": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access"
+    }
+  ],
+  "categories": [
+    "Public-Facing Exploit",
+    "Vulnerability"
+  ],
+  "image": "CHASER-0001-log4shell.png",
+  "json": "json/CHASER-0001-log4shell.json",
+  "tool_requirements": [
+    {
+      "category": "VULNERABILITY_MANAGEMENT",
+      "capabilities": [
+        "asset_vulnerability_lookup",
+        "software_inventory"
+      ]
+    },
+    {
+      "category": "SIEM",
+      "capabilities": [
+        "log_query",
+        "correlation_search"
+      ]
+    },
+    {
+      "category": "DNS",
+      "capabilities": [
+        "domain_lookup_history"
+      ]
+    },
+    {
+      "category": "NETWORK",
+      "capabilities": [
+        "outbound_connection_search"
+      ]
+    },
+    {
+      "category": "EDR",
+      "capabilities": [
+        "process_search",
+        "file_search"
+      ]
+    },
+    {
+      "category": "ENDPOINT_ASSET_INVENTORY",
+      "capabilities": [
+        "asset_inventory"
+      ]
+    }
+  ],
+  "content": {
+    "threat_summary": "Log4Shell: Apache Log4j JNDI Exploitation",
+    "context": [
+      "Apache Log4j 2 is a Java logging library. Log4Shell (CVE-2021-44228) enables RCE through unsafe JNDI lookup behavior in log4j-core.",
+      "Affected: log4j-core 2.0-beta9 through 2.14.1. log4j-api alone is not affected.",
+      "Related: CVE-2021-45046 and CVE-2021-45105.",
+      "Indicators: ${jndi:ldap://, ${jndi:rmi://, ${jndi:dns://, encoded variants, unexpected outbound callbacks."
+    ],
+    "hypothesis": [
+      "A threat actor attempted to exploit a vulnerable public-facing Java application with Log4Shell, causing suspicious JNDI lookup strings, outbound callbacks, or follow-on host execution."
+    ],
+    "analyze": [
+      "Vulnerability and software inventory for Java applications, containers, and vendor products showing log4j-core package name, path, version, and internet exposure.",
+      "Raw web, application, WAF, reverse-proxy, and load balancer logs with URLs, headers, user agents, referrers, and request bodies for JNDI strings or encoded variants.",
+      "DNS, proxy, firewall, and flow telemetry showing outbound LDAP, RMI, DNS, IIOP, NIS, or HTTP/S callbacks from application servers.",
+      "EDR telemetry for java/javaw child processes, outbound connections, file writes, webroot changes, webshell indicators, service accounts, and persistence.",
+      "Visibility gaps such as missing request-body logging, egress blind spots, container inventory gaps, or no EDR on application hosts."
+    ],
+    "strategize": [
+      "Scope internet-facing Java applications, vendor appliances, containers, and hosts with log4j-core 2.0-beta9 through 2.14.1.",
+      "Use a lookback from 2021-12-01 through patch date or current exposure; narrow pivots around attempts by +/-30 minutes and host review by 24 hours.",
+      "Query inbound logs for literal, encoded, and obfuscated JNDI payloads in URLs, headers, user agents, referrers, and bodies; normalize WAF/proxy source fields.",
+      "Pivot each hit to target exposure, source reputation, callback DNS/proxy/firewall activity, then EDR process and file telemetry.",
+      "Decision points: no vulnerable asset, exposure only, attempt without callback, callback without execution, execution or persistence, or telemetry gap."
+    ],
+    "execute": {
+      "prevention": [
+        "Upgrade Java 8+ environments to Log4j 2.17.0 or later; Java 7 to 2.12.3 or later; prefer the latest supported release.",
+        "If patching is delayed, isolate exposed systems and remove or disable JndiLookup.class per vendor guidance.",
+        "Restrict outbound LDAP/RMI from application servers and validate WAF and egress controls."
+      ],
+      "escalation": [
+        "Escalate to IR if exploit attempts correlate with outbound callbacks, suspicious Java child processes, file drops, or webshells.",
+        "Map primary activity to MITRE ATT&CK T1190: Exploit Public-Facing Application."
+      ],
+      "finding_actions": [
+        {
+          "finding": "No evidence",
+          "action": "Document the scoped assets, searched data sources, time window, and negative results; keep scheduled patch and detection validation work."
+        },
+        {
+          "finding": "Exposure only",
+          "action": "Remediate or mitigate vulnerable log4j-core, confirm owner and patch deadline, restrict risky egress, and monitor for new attempts."
+        },
+        {
+          "finding": "Suspicious activity",
+          "action": "Escalate for triage when inbound JNDI attempts align with callbacks, unusual source behavior, or weak host evidence; preserve logs and enrich indicators."
+        },
+        {
+          "finding": "Confirmed compromise",
+          "action": "Open incident response, preserve forensic evidence, contain through approved channels, eradicate dropped artifacts, and validate patching before recovery."
+        },
+        {
+          "finding": "Telemetry gap",
+          "action": "Record the missing visibility, assign an owner, add or tune collection for web requests, egress, inventory, or EDR, and rerun the hunt when available."
+        }
+      ]
+    },
+    "review": [
+      "Capture which detections found JNDI payloads, callbacks, Java child processes, file drops, and webshell indicators, and note missed coverage.",
+      "Convert validated search logic into durable SIEM, EDR, WAF, and egress detections for literal, encoded, and obfuscated payload variants.",
+      "Close telemetry gaps for request body/header logging, DNS/proxy/firewall egress, software inventory, container images, and EDR on Java servers.",
+      "Update asset ownership, patch records, exception tracking, playbooks, and this CHASER Card with lessons learned from the hunt."
+    ]
+  },
+  "llm_instructions": {
+    "plain_language": "Hunt for evidence that Log4Shell was attempted or successful. Start with asset exposure, then look for suspicious inbound JNDI strings, outbound callbacks, and Java process/file activity.",
+    "hunt_goal": "Determine whether vulnerable Log4j assets were exposed, targeted, or compromised.",
+    "constraints": [
+      "Read-only actions only.",
+      "Do not perform exploitation or active scanning unless a configured tool explicitly supports safe inventory lookup.",
+      "Correlate evidence before labeling a host compromised."
+    ],
+    "report_expectations": [
+      "Exposure summary",
+      "Attempted exploitation evidence",
+      "Callback evidence",
+      "Host execution evidence",
+      "Telemetry gaps",
+      "Recommended disposition"
+    ],
+    "hunt_guidance": {
+      "what_to_look_for": "Inbound requests containing a JNDI lookup string (e.g. ${jndi:ldap://...}, ${jndi:rmi://...}, ${jndi:dns://...} or obfuscated/encoded variants) logged by a Java application running vulnerable log4j-core, followed by an outbound LDAP/RMI/DNS/HTTP callback or anomalous Java child-process execution from that server.",
+      "key_entities": [
+        "source IP and ASN/geo of the requester",
+        "target host / application server",
+        "request URL, URI, HTTP header (User-Agent, X-Api-Version, Referer), and POST body fields carrying the JNDI string",
+        "callback destination IP/domain and protocol (LDAP, RMI, DNS, HTTP)",
+        "Java process (java/javaw) and its child processes",
+        "service account the application runs as",
+        "dropped file paths and webshell artifacts"
+      ],
+      "indicators": [
+        "request fields containing ${jndi:ldap://, ${jndi:rmi://, ${jndi:dns://, ${jndi:iiop://, or ${jndi:nis://",
+        "obfuscated JNDI payloads such as ${${::-j}${::-n}${::-d}${::-i}:...} or ${lower:j}ndi and URL/Base64-encoded variants like %24%7Bjndi or jndi%3A",
+        "nested log4j lookups (${env:}, ${sys:}, ${lower:}, ${upper:}) used to exfiltrate data via the callback hostname",
+        "outbound LDAP (389/636), RMI (1099), or unexpected DNS/HTTP callbacks originating from an internet-facing application server to an external or hosting/VPS address",
+        "Java (java/javaw) spawning cmd.exe, powershell.exe, sh, bash, curl, wget, or whoami shortly after a JNDI request",
+        "new class/jar/script files written or webshells dropped under the application or web root after an exploit attempt"
+      ],
+      "search_terms": [
+        "log4shell",
+        "log4j",
+        "log4j-core",
+        "jndi",
+        "ldap",
+        "rmi",
+        "JndiLookup",
+        "${jndi:",
+        "jndi:ldap",
+        "jndi:rmi",
+        "jndi:dns",
+        "lower:j",
+        "Base64",
+        "CVE-2021-44228",
+        "CVE-2021-45046",
+        "CVE-2021-45105"
+      ],
+      "data_sources": [
+        "web server, application, WAF, reverse-proxy, and load balancer logs",
+        "vulnerability management and software inventory",
+        "DNS resolution logs",
+        "proxy and firewall outbound connection logs",
+        "EDR process, network, and file telemetry on application servers"
+      ],
+      "investigation_strategy": [
+        "Inventory Java applications and vendor products that bundle log4j-core (versions 2.0-beta9 through 2.14.1); prioritize internet-facing systems.",
+        "Search web, application, WAF, proxy, and load balancer logs across the window for JNDI strings in URLs, headers, user agents, and POST bodies, including obfuscated and encoded variants.",
+        "For each host that received a JNDI request, pivot to DNS, proxy, and firewall logs for matching outbound LDAP/RMI/DNS/HTTP callbacks around the same time.",
+        "Use EDR to inspect Java child processes, file drops, and webshells on hosts with confirmed requests or callbacks, and identify the service account and time window.",
+        "Correlate exploit attempt -> callback -> host execution -> persistence, and separate background internet scanning from attempts that produced a callback or process execution."
+      ],
+      "confirming_signals": [
+        "A JNDI request landing on a host running vulnerable log4j-core that is followed by an outbound LDAP/RMI/DNS/HTTP callback or by anomalous Java child-process execution, file drop, or webshell on that host."
+      ],
+      "refuting_signals": [
+        "JNDI strings appear only in logs but the receiving application does not use a vulnerable log4j-core version, with no callback or process activity.",
+        "Requests are untargeted internet-wide scanning with no successful callback and no host-side execution.",
+        "The callback hostname/IP belongs to a sanctioned vulnerability scanner or authorized security test.",
+        "No internet-facing assets bundle affected log4j-core versions."
+      ],
+      "priority_assets": [
+        "internet-facing Java applications and vendor products bundling vulnerable log4j-core",
+        "application servers behind WAFs and reverse proxies that log raw request input",
+        "hosts with confirmed inbound JNDI strings or outbound LDAP/RMI/DNS callbacks"
+      ],
+      "conclusion_criteria": "Conclude once you can state, per in-scope asset, whether it runs vulnerable log4j-core, whether it received JNDI exploit attempts, and whether any attempt produced an outbound callback or host execution indicating compromise — or that web/DNS/proxy/EDR telemetry cannot prove exploitation outcome (telemetry gap)."
+    }
+  },
+  "execution_plan": {
+    "context": [
+      "State that the hunt is for Log4Shell exploitation of vulnerable log4j-core, including CVE-2021-44228, related CVEs, JNDI lookup behavior, affected Java systems, and likely indicators.",
+      "Explain why it matters: public-facing exploitation can lead to remote code execution, outbound callbacks, host execution, file drops, and persistence."
+    ],
+    "hypothesis": [
+      "Test whether a vulnerable public-facing Java application received a Log4Shell JNDI payload and produced callback, process, file, or persistence evidence.",
+      "Name the scoped environment, likely affected assets, expected evidence, and conditions that would weaken or disprove exploitation."
+    ],
+    "analyze": [
+      "Identify the evidence needed before running the hunt: software inventory, exposure data, raw web/application/WAF/proxy logs, DNS/proxy/firewall/flow telemetry, and EDR data.",
+      "Confirm that telemetry can show request fields, outbound callbacks, Java child processes, file writes, webroot changes, service account context, and persistence.",
+      "Record visibility gaps such as missing request bodies, unavailable egress telemetry, incomplete container inventory, or absent EDR coverage."
+    ],
+    "strategize": [
+      "Define scope around internet-facing Java applications, vendor products, containers, and hosts running affected log4j-core versions.",
+      "Set the hunt window from 2021-12-01 through patch date or current exposure, then pivot around attempts by +/-30 minutes and host activity by 24 hours.",
+      "Search for literal, encoded, and obfuscated JNDI payloads in URLs, headers, user agents, referrers, and request bodies.",
+      "Pivot from each attempt to target exposure, source reputation, outbound callbacks, Java child processes, file writes, and persistence indicators.",
+      "Use decision points for no evidence, exposure only, suspicious activity, confirmed compromise, or telemetry gap."
+    ],
+    "execute": [
+      "Map no evidence, exposure only, suspicious activity, confirmed compromise, and telemetry gap findings to the card's finding_actions.",
+      "Recommend documentation, remediation, escalation, detection tuning, reporting, or incident response through approved channels only."
+    ],
+    "review": [
+      "Capture lessons from detections, controls, patch records, exception tracking, and missed or weak evidence.",
+      "Identify documentation, telemetry, query, detection, and playbook improvements for future Log4Shell hunts.",
+      "Update this CHASER Card when lessons learned change the hunt logic, evidence expectations, or finding actions."
+    ]
+  },
+  "query_examples": {
+    "splunk_spl": [
+      "index=web OR index=waf (\"${jndi:\" OR \"%24%7Bjndi\" OR \"jndi%3A\") | stats count by src_ip, host, uri, user_agent",
+      "index=dns (\"ldap\" OR \"rmi\" OR \"jndi\") | stats count by src_ip, query"
+    ],
+    "sentinel_kql": [
+      "W3CIISLog | where csUriStem has \"${jndi:\" or csUserAgent has \"${jndi:\"",
+      "DeviceProcessEvents | where InitiatingProcessFileName has_any (\"java.exe\",\"java\") | where FileName in~ (\"cmd.exe\",\"powershell.exe\",\"bash\",\"sh\",\"curl\",\"wget\")"
+    ],
+    "elastic_lucene": [
+      "url.original:*jndi* OR user_agent.original:*jndi* OR http.request.body.content:*jndi*"
+    ]
+  },
+  "safety_constraints": {
+    "read_only": true,
+    "blocked_actions": [
+      "delete",
+      "quarantine",
+      "isolate",
+      "disable_user",
+      "reset_password",
+      "revoke_session",
+      "modify_policy",
+      "remediate",
+      "block_ip",
+      "send_email",
+      "purge_email",
+      "active_exploitation"
+    ],
+    "privacy_note": "Use workspace privacy settings. Do not include secrets in prompts, logs, reports, or debug output."
+  },
+  "report_expectations": [
+    "Exposure summary",
+    "Attempted exploitation evidence",
+    "Callback evidence",
+    "Host execution evidence",
+    "Telemetry gaps",
+    "Recommended disposition"
+  ],
+  "references": [
+    {
+      "title": "Apache Logging Services Security",
+      "url": "https://logging.apache.org/security.html"
+    },
+    {
+      "title": "CISA AA21-356A: Mitigating Log4Shell and Other Log4j-Related Vulnerabilities",
+      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-356a"
+    },
+    {
+      "title": "MITRE ATT&CK T1190",
+      "url": "https://attack.mitre.org/techniques/T1190/"
+    }
+  ]
+}

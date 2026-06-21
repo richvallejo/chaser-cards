@@ -1,0 +1,490 @@
+{
+  "schema_version": "1.0.0",
+  "repository_name": "chaser-cards",
+  "publisher": "Richard Vallejo",
+  "publisher_url": "https://richardvallejo.com",
+  "license": "CC BY 4.0",
+  "updated": "2026-06-21",
+  "chaser_model": {
+    "version": "2026-06-18",
+    "source": "https://richardvallejo.com/chaser.html",
+    "stage_questions": {
+      "context": "What are we hunting for, and why does it matter?",
+      "hypothesis": "What do we believe may be happening in the environment?",
+      "analyze": "What evidence do we need to examine?",
+      "strategize": "How are we going to run the hunt?",
+      "execute": "What do we do with what we found?",
+      "review": "What did we learn, and what should change?"
+    },
+    "stage_purposes": {
+      "context": "Relevant CVEs, techniques, affected systems, known behaviors, likely impact, and indicators.",
+      "hypothesis": "A testable statement that identifies likely behavior, affected environment, and evidence that would support or challenge the hunt.",
+      "analyze": "Telemetry and evidence sources needed to confirm, weaken, or disprove the hypothesis, including visibility gaps.",
+      "strategize": "Scope, time window, affected assets, search logic, pivots, enrichment, expected results, false positives, and decision points.",
+      "execute": "Finding-based actions such as documenting results, remediation, escalation, detection tuning, reporting, or incident response.",
+      "review": "Lessons learned and improvements to detections, controls, telemetry, documentation, playbooks, and future hunt cards."
+    }
+  },
+  "cards": [
+    {
+      "id": "CHASER-0001",
+      "slug": "log4shell",
+      "title": "Log4Shell",
+      "subtitle": "Apache Log4j JNDI Exploitation",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Public-Facing Exploit",
+        "Vulnerability"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "tactic": "Initial Access"
+        }
+      ],
+      "required_tool_categories": [
+        "DNS",
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0001-log4shell.png",
+      "json": "json/CHASER-0001-log4shell.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21"
+    },
+    {
+      "id": "CHASER-0002",
+      "slug": "brute-force-credential-attack",
+      "title": "Brute Force Credential Attack",
+      "subtitle": "Repeated Authentication Attempts",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Credential Access",
+        "Identity"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1110",
+          "name": "Brute Force",
+          "tactic": "Credential Access"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "IDENTITY",
+        "NETWORK",
+        "SIEM"
+      ],
+      "image": "CHASER-0002-brute-force-credential-attack.png",
+      "json": "json/CHASER-0002-brute-force-credential-attack.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21"
+    },
+    {
+      "id": "CHASER-0003",
+      "slug": "phishing-email-investigation",
+      "title": "Phishing Email Investigation",
+      "subtitle": "Suspicious Email, Links, and Attachments",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Initial Access",
+        "Email"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "tactic": "Initial Access"
+        }
+      ],
+      "required_tool_categories": [
+        "DNS",
+        "EDR",
+        "EMAIL",
+        "IDENTITY",
+        "NETWORK",
+        "SIEM"
+      ],
+      "image": "CHASER-0003-phishing-email-investigation.png",
+      "json": "json/CHASER-0003-phishing-email-investigation.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21"
+    },
+    {
+      "id": "CHASER-0004",
+      "slug": "suspicious-powershell-execution",
+      "title": "Suspicious PowerShell Execution",
+      "subtitle": "Command and Scripting Interpreter Abuse",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Execution",
+        "Endpoint"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1059.001",
+          "name": "PowerShell",
+          "tactic": "Execution"
+        }
+      ],
+      "required_tool_categories": [
+        "DNS",
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM"
+      ],
+      "image": "CHASER-0004-suspicious-powershell-execution.png",
+      "json": "json/CHASER-0004-suspicious-powershell-execution.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21"
+    },
+    {
+      "id": "CHASER-0005",
+      "slug": "cloud-identity-anomaly",
+      "title": "Cloud Identity Anomaly",
+      "subtitle": "Suspicious SaaS or IdP Sign-In Behavior",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Identity",
+        "Cloud"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1078.004",
+          "name": "Valid Accounts: Cloud Accounts",
+          "tactic": "Initial Access / Persistence / Privilege Escalation / Defense Evasion"
+        }
+      ],
+      "required_tool_categories": [
+        "CLOUD",
+        "ENDPOINT_ASSET_INVENTORY",
+        "IDENTITY",
+        "NETWORK",
+        "SIEM"
+      ],
+      "image": "CHASER-0005-cloud-identity-anomaly.png",
+      "json": "json/CHASER-0005-cloud-identity-anomaly.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21"
+    },
+    {
+      "id": "CHASER-0006",
+      "slug": "splunk-enterprise-missing-authentication-cve-2026-20253",
+      "title": "Splunk Enterprise Missing Authentication",
+      "subtitle": "Unauthenticated File Operation Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Enterprise Software",
+        "Missing Authentication",
+        "SIEM"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0006-splunk-enterprise-missing-authentication-cve-2026-20253.png",
+      "json": "json/CHASER-0006-splunk-enterprise-missing-authentication-cve-2026-20253.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-20253"
+    },
+    {
+      "id": "CHASER-0007",
+      "slug": "litespeed-cpanel-plugin-symlink-following-cve-2026-54420",
+      "title": "LiteSpeed cPanel Plugin Symlink Following",
+      "subtitle": "Shared Hosting Privilege Escalation Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Hosting",
+        "Privilege Escalation",
+        "Linux"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0007-litespeed-cpanel-plugin-symlink-following-cve-2026-54420.png",
+      "json": "json/CHASER-0007-litespeed-cpanel-plugin-symlink-following-cve-2026-54420.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-54420"
+    },
+    {
+      "id": "CHASER-0008",
+      "slug": "cisco-sd-wan-manager-path-traversal-cve-2026-20262",
+      "title": "Cisco SD-WAN Manager Path Traversal",
+      "subtitle": "Authenticated Arbitrary File Write Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Network Management",
+        "Path Traversal",
+        "SD-WAN"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0008-cisco-sd-wan-manager-path-traversal-cve-2026-20262.png",
+      "json": "json/CHASER-0008-cisco-sd-wan-manager-path-traversal-cve-2026-20262.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-20262"
+    },
+    {
+      "id": "CHASER-0009",
+      "slug": "oracle-peoplesoft-missing-authentication-cve-2026-35273",
+      "title": "Oracle PeopleSoft Missing Authentication",
+      "subtitle": "Unauthenticated PeopleTools RCE Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Enterprise Application",
+        "Missing Authentication",
+        "RCE"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0009-oracle-peoplesoft-missing-authentication-cve-2026-35273.png",
+      "json": "json/CHASER-0009-oracle-peoplesoft-missing-authentication-cve-2026-35273.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-35273"
+    },
+    {
+      "id": "CHASER-0010",
+      "slug": "ivanti-sentry-os-command-injection-cve-2026-10520",
+      "title": "Ivanti Sentry OS Command Injection",
+      "subtitle": "Pre-Auth Root RCE Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Edge Appliance",
+        "Command Injection",
+        "RCE"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0010-ivanti-sentry-os-command-injection-cve-2026-10520.png",
+      "json": "json/CHASER-0010-ivanti-sentry-os-command-injection-cve-2026-10520.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-10520"
+    },
+    {
+      "id": "CHASER-0011",
+      "slug": "cisco-sd-wan-manager-command-injection-cve-2026-20245",
+      "title": "Cisco SD-WAN Manager Command Injection",
+      "subtitle": "Local Authenticated Root Execution Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Network Management",
+        "Command Injection",
+        "SD-WAN"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0011-cisco-sd-wan-manager-command-injection-cve-2026-20245.png",
+      "json": "json/CHASER-0011-cisco-sd-wan-manager-command-injection-cve-2026-20245.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-20245"
+    },
+    {
+      "id": "CHASER-0012",
+      "slug": "chromium-v8-out-of-bounds-read-write-cve-2026-11645",
+      "title": "Chromium V8 Out-of-Bounds Read/Write",
+      "subtitle": "Browser Zero-Day Exploitation Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Browser",
+        "Client Exploit",
+        "Endpoint"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1203",
+          "name": "Exploitation for Client Execution"
+        }
+      ],
+      "required_tool_categories": [
+        "DNS",
+        "EDR",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0012-chromium-v8-out-of-bounds-read-write-cve-2026-11645.png",
+      "json": "json/CHASER-0012-chromium-v8-out-of-bounds-read-write-cve-2026-11645.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-11645"
+    },
+    {
+      "id": "CHASER-0013",
+      "slug": "arista-eos-tunnel-decapsulation-cve-2026-7473",
+      "title": "Arista EOS Tunnel Decapsulation",
+      "subtitle": "Unexpected Tunnel Forwarding Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Network Infrastructure",
+        "Tunneling",
+        "DoS"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1498",
+          "name": "Network Denial of Service"
+        }
+      ],
+      "required_tool_categories": [
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0013-arista-eos-tunnel-decapsulation-cve-2026-7473.png",
+      "json": "json/CHASER-0013-arista-eos-tunnel-decapsulation-cve-2026-7473.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-7473"
+    },
+    {
+      "id": "CHASER-0014",
+      "slug": "berriai-litellm-command-injection-cve-2026-42271",
+      "title": "BerriAI LiteLLM Command Injection",
+      "subtitle": "AI Gateway MCP Stdio Abuse Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "AI Gateway",
+        "Command Injection",
+        "MCP"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application"
+        }
+      ],
+      "required_tool_categories": [
+        "CLOUD",
+        "EDR",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0014-berriai-litellm-command-injection-cve-2026-42271.png",
+      "json": "json/CHASER-0014-berriai-litellm-command-injection-cve-2026-42271.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-42271"
+    },
+    {
+      "id": "CHASER-0015",
+      "slug": "check-point-vpn-ikev1-auth-bypass-cve-2026-50751",
+      "title": "Check Point VPN IKEv1 Auth Bypass",
+      "subtitle": "Unauthorized Remote Access VPN Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "VPN",
+        "Authentication Bypass",
+        "Edge"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1133",
+          "name": "External Remote Services"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "IDENTITY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0015-check-point-vpn-ikev1-auth-bypass-cve-2026-50751.png",
+      "json": "json/CHASER-0015-check-point-vpn-ikev1-auth-bypass-cve-2026-50751.json",
+      "created": "2026-06-19",
+      "updated": "2026-06-21",
+      "cve": "CVE-2026-50751"
+    }
+  ]
+}
