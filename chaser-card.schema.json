@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://richardvallejo.com/schemas/chaser-card.schema.json",
+  "title": "CHASER Card",
+  "type": "object",
+  "required": [
+    "id",
+    "slug",
+    "title",
+    "version",
+    "status",
+    "author",
+    "license",
+    "mitre_attack",
+    "tool_requirements",
+    "content",
+    "llm_instructions",
+    "execution_plan",
+    "safety_constraints",
+    "references"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^CHASER-[0-9]{4}$"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "deprecated",
+        "retired",
+        "draft"
+      ]
+    },
+    "created": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string"
+    },
+    "author": {
+      "type": "object"
+    },
+    "license": {
+      "type": "string"
+    },
+    "branding": {
+      "type": "object"
+    },
+    "chaser_model": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "visual_response_label": {
+          "type": "string"
+        },
+        "stage_questions": {
+          "type": "object"
+        },
+        "stage_purposes": {
+          "type": "object"
+        }
+      }
+    },
+    "mitre_attack": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "image": {
+      "type": "string"
+    },
+    "json": {
+      "type": "string"
+    },
+    "tool_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "category",
+          "capabilities"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "required": [
+        "threat_summary",
+        "context",
+        "hypothesis",
+        "analyze",
+        "strategize",
+        "execute",
+        "review"
+      ],
+      "properties": {
+        "threat_summary": {
+          "type": "string"
+        },
+        "context": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hypothesis": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "analyze": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "strategize": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "execute": {
+          "type": "object",
+          "required": [
+            "prevention",
+            "escalation"
+          ],
+          "properties": {
+            "prevention": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "escalation": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "finding_actions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "finding",
+                  "action"
+                ],
+                "properties": {
+                  "finding": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "review": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "llm_instructions": {
+      "type": "object"
+    },
+    "execution_plan": {
+      "type": "object"
+    },
+    "query_examples": {
+      "type": "object"
+    },
+    "safety_constraints": {
+      "type": "object"
+    },
+    "report_expectations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}
