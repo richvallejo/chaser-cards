@@ -4,7 +4,7 @@
   "publisher": "Richard Vallejo",
   "publisher_url": "https://richardvallejo.com",
   "license": "CC BY 4.0",
-  "updated": "2026-06-21",
+  "updated": "2026-06-30",
   "chaser_model": {
     "version": "2026-06-18",
     "source": "https://richardvallejo.com/chaser.html",
@@ -485,6 +485,44 @@
       "created": "2026-06-19",
       "updated": "2026-06-21",
       "cve": "CVE-2026-50751"
+    },
+    {
+      "id": "CHASER-0016",
+      "slug": "simplehelp-oidc-auth-bypass-cve-2026-48558",
+      "title": "SimpleHelp OIDC Auth Bypass",
+      "subtitle": "RMM Technician Session Abuse Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "RMM",
+        "Authentication Bypass",
+        "Edge"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "tactic": "Initial Access"
+        },
+        {
+          "id": "T1219",
+          "name": "Remote Access Software",
+          "tactic": "Command and Control"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "IDENTITY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0016-simplehelp-oidc-auth-bypass-cve-2026-48558.png",
+      "json": "json/CHASER-0016-simplehelp-oidc-auth-bypass-cve-2026-48558.json",
+      "created": "2026-06-30",
+      "updated": "2026-06-30",
+      "cve": "CVE-2026-48558"
     }
   ]
 }
