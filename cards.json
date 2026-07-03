@@ -566,6 +566,45 @@
       "json": "json/CHASER-0017-fortibleed-credential-theft.json",
       "created": "2026-07-02",
       "updated": "2026-07-02"
+    },
+    {
+      "id": "CHASER-0018",
+      "slug": "microsoft-sharepoint-deserialization-rce",
+      "title": "Microsoft SharePoint Deserialization RCE",
+      "subtitle": "Authenticated Site Member Exploitation Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "SharePoint",
+        "Deserialization",
+        "RCE",
+        "Enterprise Software"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "tactic": "Initial Access"
+        },
+        {
+          "id": "T1505.003",
+          "name": "Server Software Component: Web Shell",
+          "tactic": "Persistence"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "IDENTITY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0018-microsoft-sharepoint-deserialization-rce.png",
+      "json": "json/CHASER-0018-microsoft-sharepoint-deserialization-rce.json",
+      "created": "2026-07-02",
+      "updated": "2026-07-02",
+      "cve": "CVE-2026-45659"
     }
   ]
 }

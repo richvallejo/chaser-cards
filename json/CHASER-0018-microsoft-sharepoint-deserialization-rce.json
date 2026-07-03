@@ -1,0 +1,367 @@
+{
+  "$schema": "./chaser-card.schema.json",
+  "id": "CHASER-0018",
+  "slug": "microsoft-sharepoint-deserialization-rce",
+  "title": "Microsoft SharePoint Deserialization RCE",
+  "subtitle": "Authenticated Site Member Exploitation Hunt",
+  "version": "1.0.0",
+  "status": "active",
+  "created": "2026-07-02",
+  "updated": "2026-07-02",
+  "author": {
+    "name": "Richard Vallejo",
+    "website": "https://richardvallejo.com"
+  },
+  "license": "CC BY 4.0",
+  "branding": {
+    "series": "CHASER Cards",
+    "repository": "https://github.com/richvallejo/chaser-cards"
+  },
+  "chaser_model": {
+    "version": "2026-06-18",
+    "source": "https://richardvallejo.com/chaser.html",
+    "stage_questions": {
+      "context": "What are we hunting for, and why does it matter?",
+      "hypothesis": "What do we believe may be happening in the environment?",
+      "analyze": "What evidence do we need to examine?",
+      "strategize": "How are we going to run the hunt?",
+      "execute": "What do we do with what we found?",
+      "review": "What did we learn, and what should change?"
+    },
+    "stage_purposes": {
+      "context": "Relevant CVEs, techniques, affected systems, known behaviors, likely impact, and indicators.",
+      "hypothesis": "A testable statement that identifies likely behavior, affected environment, and evidence that would support or challenge the hunt.",
+      "analyze": "Telemetry and evidence sources needed to confirm, weaken, or disprove the hypothesis, including visibility gaps.",
+      "strategize": "Scope, time window, affected assets, search logic, pivots, enrichment, expected results, false positives, and decision points.",
+      "execute": "Finding-based actions such as documenting results, remediation, escalation, detection tuning, reporting, or incident response.",
+      "review": "Lessons learned and improvements to detections, controls, telemetry, documentation, playbooks, and future hunt cards."
+    }
+  },
+  "cve": "CVE-2026-45659",
+  "mitre_attack": [
+    {
+      "id": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access"
+    },
+    {
+      "id": "T1505.003",
+      "name": "Server Software Component: Web Shell",
+      "tactic": "Persistence"
+    }
+  ],
+  "categories": [
+    "SharePoint",
+    "Deserialization",
+    "RCE",
+    "Enterprise Software"
+  ],
+  "image": "CHASER-0018-microsoft-sharepoint-deserialization-rce.png",
+  "json": "json/CHASER-0018-microsoft-sharepoint-deserialization-rce.json",
+  "tool_requirements": [
+    {
+      "category": "SIEM",
+      "capabilities": [
+        "log_query",
+        "application_log_query",
+        "correlation_search"
+      ]
+    },
+    {
+      "category": "EDR",
+      "capabilities": [
+        "process_search",
+        "command_line_search",
+        "file_search",
+        "network_connection_search"
+      ]
+    },
+    {
+      "category": "NETWORK",
+      "capabilities": [
+        "connection_search",
+        "source_ip_analysis",
+        "dns_query",
+        "proxy_log_query"
+      ]
+    },
+    {
+      "category": "IDENTITY",
+      "capabilities": [
+        "authentication_log_query",
+        "user_activity_query",
+        "privileged_account_review"
+      ]
+    },
+    {
+      "category": "VULNERABILITY_MANAGEMENT",
+      "capabilities": [
+        "asset_vulnerability_lookup",
+        "software_inventory"
+      ]
+    },
+    {
+      "category": "ENDPOINT_ASSET_INVENTORY",
+      "capabilities": [
+        "asset_inventory",
+        "owner_lookup"
+      ]
+    }
+  ],
+  "content": {
+    "threat_summary": "Microsoft SharePoint Deserialization RCE: Authenticated Site Member Exploitation Hunt (CVE-2026-45659)",
+    "context": [
+      "CVE-2026-45659 is a Microsoft Office SharePoint deserialization flaw that allows an authorized attacker to execute code over a network.",
+      "NVD lists CVSS 8.8 HIGH with low attack complexity, low privileges, no user interaction, and CWE-502 Deserialization of Untrusted Data.",
+      "CISA added the vulnerability to the KEV catalog on July 1, 2026 after evidence of active exploitation, with required federal action by July 4, 2026.",
+      "Hunt focus: vulnerable on-prem SharePoint farms, low-privileged Site Member activity, suspicious SharePoint/IIS/ULS requests, SharePoint service process child activity, web-accessible file writes, and post-exploitation movement."
+    ],
+    "hypothesis": [
+      "An authenticated low-privileged user or compromised account abused CVE-2026-45659 against an on-prem SharePoint Server to execute code, then attempted persistence, credential access, discovery, or lateral movement; expected evidence is abnormal SharePoint request activity correlated with SharePoint worker process execution, file writes, outbound traffic, or unusual service-account behavior."
+    ],
+    "analyze": [
+      "SharePoint asset inventory, farm role, internet exposure, version/build, affected product family, patch level, service accounts, site collections, and whether the server hosts sensitive repositories or workflows.",
+      "IIS, SharePoint ULS, Windows Event, authentication, reverse-proxy, WAF, and SIEM logs showing source IP, user, site path, request method, status, user agent, correlation ID, errors, and unusual low-privileged Site Member activity.",
+      "EDR and host telemetry for SharePoint-related parent processes such as w3wp.exe, OWSTIMER.EXE, or SharePoint service processes spawning shells, scripts, archive tools, discovery commands, or network utilities.",
+      "File, registry, web-root, temporary directory, scheduled task, service, PowerShell, AMSI, DNS, proxy, firewall, and network-flow evidence for web shells, suspicious ASPX files, credential access, outbound callbacks, or lateral movement.",
+      "Visibility gaps such as missing IIS request fields, unavailable ULS correlation IDs, short log retention, absent command lines, no file auditing on SharePoint directories, unmanaged farm members, or incomplete identity attribution."
+    ],
+    "strategize": [
+      "Scope on-prem SharePoint Server Subscription Edition, SharePoint Server 2019, and SharePoint Enterprise Server 2016 first, prioritizing internet-facing or broadly reachable farms, unpatched builds, high-value content, and externally invited or low-trust Site Member populations.",
+      "Use the Microsoft disclosure, patch, CISA KEV date, and available retention as anchors; expand around first suspicious SharePoint errors, EDR alerts, low-privileged access spikes, or unexplained SharePoint process execution.",
+      "Query IIS/ULS/proxy logs for unusual authenticated requests by low-privileged accounts, rare paths, abnormal POST volume, unexpected user agents, repeated 500-series errors, odd correlation IDs, and requests followed by process or file activity.",
+      "Pivot suspicious requests to user identity, session, source IP, site collection, correlation ID, farm member, w3wp.exe process lineage, file writes, service-account logons, DNS, outbound connections, and internal authentication events.",
+      "Classify each farm as no evidence, exposure only, suspicious activity, confirmed compromise, or telemetry gap; suppress normal administrative, crawl, timer-job, backup, patching, and workflow activity only when account, host, time, request, and process behavior match expected operations."
+    ],
+    "execute": {
+      "prevention": [
+        "Recommend applying Microsoft SharePoint security updates or current cumulative updates across all farm members according to vendor guidance.",
+        "Recommend reducing external exposure, validating low-privileged site membership, and enforcing strong authentication for SharePoint access.",
+        "Recommend EDR, AMSI, script-block logging, IIS/ULS retention, file auditing, egress control, and monitoring for SharePoint service process child activity."
+      ],
+      "escalation": [
+        "Escalate if SharePoint worker processes spawn unexpected commands, write web-accessible files, access credentials, initiate suspicious outbound traffic, or correlate to suspicious low-privileged requests.",
+        "Treat confirmed exploitation as SharePoint farm compromise and assess service accounts, content databases, connected workflows, and downstream systems."
+      ],
+      "finding_actions": [
+        {
+          "finding": "no evidence",
+          "action": "Document scoped SharePoint farms, affected versions/builds, patch state, exposure, logs searched, time window, and negative results for suspicious requests, process execution, file writes, or follow-on activity."
+        },
+        {
+          "finding": "exposure only",
+          "action": "Open remediation to patch all farm members, reduce exposure, review Site Member populations, validate service-account permissions, and monitor for delayed exploitation evidence."
+        },
+        {
+          "finding": "suspicious activity",
+          "action": "Preserve IIS, ULS, Windows, EDR, file, identity, proxy, DNS, and firewall evidence; enrich user, source IP, correlation ID, farm member, process, file, and destination pivots; escalate for incident triage."
+        },
+        {
+          "finding": "confirmed compromise",
+          "action": "Open SharePoint compromise response, preserve forensic evidence, assess web shells and process execution, review service-account and database exposure, identify lateral movement, and coordinate approved containment and recovery."
+        },
+        {
+          "finding": "telemetry gap",
+          "action": "Record missing IIS, ULS, identity, EDR, command-line, file, AMSI, proxy, DNS, firewall, or farm-member visibility; state confidence impact; add required telemetry and rerun the hunt."
+        }
+      ]
+    },
+    "review": [
+      "Capture what the hunt proved or could not prove about SharePoint exposure, patch state, low-privileged request anomalies, process execution, persistence, credential access, and lateral movement.",
+      "Convert validated SharePoint request patterns, ULS/IIS anomalies, w3wp.exe child process behavior, suspicious file writes, web shells, and service-account misuse into durable detections.",
+      "Close telemetry gaps for IIS fields, ULS correlation, SharePoint audit logs, identity attribution, process command lines, file auditing, AMSI/script logging, DNS, proxy, firewall, and farm-wide EDR coverage.",
+      "Update SharePoint patch procedures, low-privilege access reviews, external exposure rules, incident escalation criteria, service-account monitoring, and this CHASER Card with hunt lessons."
+    ]
+  },
+  "llm_instructions": {
+    "plain_language": "Hunt for exposure and exploitation evidence related to Microsoft SharePoint CVE-2026-45659. Follow CHASER phases, use only configured read-only tools, and distinguish exposure from suspicious activity and confirmed compromise.",
+    "hunt_goal": "Determine whether on-prem SharePoint farms in scope are vulnerable to or show evidence of exploitation for CVE-2026-45659.",
+    "constraints": [
+      "Read-only actions only.",
+      "Do not perform active scanning, exploitation, payload generation, remediation, isolation, deletion, account changes, or configuration changes.",
+      "Use internet research only if enabled by workspace and hunt settings.",
+      "Clearly distinguish exposure, attempted exploitation, suspicious activity, and confirmed compromise."
+    ],
+    "report_expectations": [
+      "Affected SharePoint farms and patch state",
+      "SharePoint/IIS/ULS evidence reviewed",
+      "Identity and Site Member activity",
+      "Host process, file, and network evidence",
+      "Findings with severity, confidence, and disposition",
+      "Telemetry gaps and limitations",
+      "Recommended next actions"
+    ],
+    "hunt_guidance": {
+      "what_to_look_for": "An authenticated low-privileged SharePoint request pattern that correlates to unexpected SharePoint worker process execution, suspicious file writes, web shell placement, credential access, outbound traffic, or lateral movement.",
+      "key_entities": [
+        "SharePoint farm, server, and role",
+        "SharePoint version/build and patch state",
+        "site collection and request path",
+        "authenticated user, role, and session",
+        "source IP, user agent, and correlation ID",
+        "w3wp.exe or SharePoint service process",
+        "new or modified files, outbound destinations, and downstream authentication events"
+      ],
+      "indicators": [
+        "unpatched SharePoint Server Subscription Edition, SharePoint Server 2019, or SharePoint Enterprise Server 2016 farm member",
+        "low-privileged Site Member activity against rare SharePoint paths or functions",
+        "abnormal authenticated POST activity, unusual user agents, repeated server errors, or rare ULS correlation patterns",
+        "w3wp.exe or SharePoint service process spawning cmd.exe, powershell.exe, cscript.exe, wscript.exe, rundll32.exe, certutil.exe, curl.exe, or archive/network utilities",
+        "new ASPX, config, script, or binary files in SharePoint web roots, layouts, feature, temp, or upload-adjacent directories outside change windows",
+        "SharePoint service account performing unusual interactive logon, network access, credential access, or connections to unexpected internal or external destinations"
+      ],
+      "search_terms": [
+        "SharePoint",
+        "CVE-2026-45659",
+        "deserialization",
+        "CWE-502",
+        "Site Member",
+        "w3wp.exe",
+        "OWSTIMER.EXE",
+        "ULS",
+        "correlation ID",
+        "ASPX",
+        "web shell",
+        "SharePoint Server 2019",
+        "SharePoint Enterprise Server 2016",
+        "SharePoint Server Subscription Edition"
+      ],
+      "data_sources": [
+        "SharePoint ULS logs",
+        "IIS access logs and HTTP error logs",
+        "reverse-proxy and WAF logs",
+        "Windows Security, System, Application, PowerShell, AMSI, and Sysmon logs",
+        "EDR process, file, command-line, and network telemetry",
+        "identity-provider, AD, and SharePoint audit logs",
+        "DNS, proxy, firewall, and network-flow logs",
+        "vulnerability management and software inventory",
+        "ticketing and change-management records"
+      ],
+      "investigation_strategy": [
+        "Inventory SharePoint farms, versions/builds, patch state, farm roles, exposure, service accounts, site collections, and ownership.",
+        "Pull IIS, ULS, proxy/WAF, identity, and SharePoint audit logs for authenticated low-privileged activity, unusual requests, server errors, and correlation IDs across the hunt window.",
+        "For candidate request patterns, search EDR and Windows telemetry on the matching farm member for SharePoint worker process child execution, suspicious file writes, script execution, outbound connections, and service-account activity.",
+        "Pivot from process and file events to DNS/proxy/firewall traffic, internal authentication, lateral movement, credential access, persistence, and content/database access.",
+        "Compare activity against patch windows, administrative operations, timer jobs, crawler activity, backups, custom workflows, and approved deployments before declaring compromise.",
+        "Assess content, service-account, database, and connected-workflow exposure for any farm member with confirmed suspicious process or file activity."
+      ],
+      "confirming_signals": [
+        "Suspicious authenticated SharePoint request by a low-privileged or compromised account correlated with w3wp.exe or SharePoint service process child execution, suspicious web-accessible file write, outbound callback, credential access, or internal movement.",
+        "SharePoint farm member running an affected build with CISA KEV-relevant activity and no benign administrative explanation."
+      ],
+      "refuting_signals": [
+        "All SharePoint farm members were patched before the hunt window and no vulnerable builds were reachable.",
+        "Candidate requests map to approved administrative, patching, crawl, workflow, backup, or user activity with no anomalous process, file, identity, or network side effects.",
+        "No suspicious SharePoint worker process child activity, web-accessible file writes, service-account anomalies, or outbound network behavior is present.",
+        "The SharePoint server is not reachable by untrusted users and all low-privileged site activity matches expected business use."
+      ],
+      "priority_assets": [
+        "internet-facing on-prem SharePoint farms",
+        "farms containing sensitive content, workflows, or integrations",
+        "farms with external sharing, partner access, or broad Site Member permissions",
+        "unpatched SharePoint Server Subscription Edition, 2019, or Enterprise Server 2016 farm members",
+        "SharePoint servers with privileged service accounts or broad database access"
+      ],
+      "conclusion_criteria": "Conclude once you can state, per SharePoint farm, whether affected builds were present and reachable, whether suspicious authenticated request patterns occurred, and whether host, file, identity, or network telemetry confirms or refutes code execution and follow-on activity, or that missing logs prevent confidence."
+    }
+  },
+  "execution_plan": {
+    "context": [
+      "State that the hunt is for Microsoft SharePoint CVE-2026-45659, a deserialization remote code execution vulnerability requiring low privileges and affecting on-prem SharePoint Server products.",
+      "Explain why it matters: SharePoint often contains sensitive documents, workflows, and integrations, and code execution on a farm member can expose content, service accounts, databases, and downstream systems."
+    ],
+    "hypothesis": [
+      "Test whether an authenticated low-privileged user or compromised account abused CVE-2026-45659 to execute code on a vulnerable SharePoint farm member.",
+      "Expected evidence includes affected build exposure, suspicious authenticated SharePoint requests, unusual IIS/ULS errors or correlation IDs, SharePoint worker process child execution, file writes, outbound traffic, credential access, or lateral movement."
+    ],
+    "analyze": [
+      "Identify required evidence: SharePoint farm inventory, version/build, product family, patch state, exposure, farm role, service accounts, site collections, high-value content, and ownership.",
+      "Confirm IIS, ULS, Windows, authentication, proxy, WAF, SharePoint audit, identity, EDR, file, PowerShell, AMSI, DNS, proxy, firewall, and network-flow telemetry needed to prove request activity and host effects.",
+      "Record visibility gaps such as missing IIS request fields, unavailable ULS correlation IDs, short retention, absent command-line telemetry, no file auditing, unmanaged farm members, or incomplete identity attribution."
+    ],
+    "strategize": [
+      "Scope on-prem SharePoint Server Subscription Edition, SharePoint Server 2019, and SharePoint Enterprise Server 2016, prioritizing internet-facing or broadly reachable farms, unpatched builds, high-value content, and low-trust Site Member populations.",
+      "Use Microsoft disclosure, patch, CISA KEV date, available retention, first suspicious SharePoint error, EDR alert, low-privileged access spike, or unexplained process execution as hunt-window anchors.",
+      "Query IIS/ULS/proxy logs for unusual authenticated requests by low-privileged accounts, rare paths, abnormal POST volume, unexpected user agents, repeated 500-series errors, and requests followed by process or file activity.",
+      "Pivot suspicious requests to user identity, session, source IP, site collection, correlation ID, farm member, w3wp.exe process lineage, file writes, service-account logons, DNS, outbound connections, and internal authentication events.",
+      "Use decision points for no evidence, exposure only, suspicious activity, confirmed compromise, and telemetry gap while suppressing known administrative, timer-job, crawl, backup, patching, and workflow activity."
+    ],
+    "execute": [
+      "Map no evidence, exposure only, suspicious activity, confirmed compromise, and telemetry gap findings to the card-defined finding_actions.",
+      "Recommend prevention for unpatched or exposed SharePoint farms and escalation for suspicious worker process execution, web-accessible file writes, credential access, outbound callbacks, service-account misuse, or lateral movement."
+    ],
+    "review": [
+      "Summarize what the hunt proved or could not prove about SharePoint exposure, patch state, suspicious low-privileged request activity, process execution, persistence, credential access, and lateral movement.",
+      "Recommend detection, control, patching, access review, logging, file auditing, egress, service-account monitoring, and incident playbook improvements.",
+      "Update this CHASER Card with validated local pivots, false positives, telemetry gaps, escalation thresholds, and future improvements."
+    ]
+  },
+  "query_examples": {
+    "generic": [
+      "Search vulnerability inventory for SharePoint farms affected by CVE-2026-45659.",
+      "Search IIS and SharePoint ULS logs for unusual authenticated low-privileged requests and server errors.",
+      "Search EDR telemetry for w3wp.exe or SharePoint service processes spawning shells, scripts, network utilities, or writing web-accessible files."
+    ]
+  },
+  "safety_constraints": {
+    "read_only": true,
+    "blocked_actions": [
+      "delete",
+      "quarantine",
+      "isolate",
+      "disable_user",
+      "reset_password",
+      "revoke_session",
+      "modify_policy",
+      "change_sharepoint_configuration",
+      "change_iis_configuration",
+      "remediate",
+      "block_ip",
+      "active_scanning",
+      "active_exploitation",
+      "exploit_validation",
+      "payload_generation",
+      "payload_execution"
+    ],
+    "privacy_note": "Use workspace privacy settings. Do not include credentials, cookies, tokens, document contents, database secrets, or sensitive SharePoint content in prompts, logs, reports, or debug output."
+  },
+  "report_expectations": [
+    "Executive summary",
+    "Findings table",
+    "Affected SharePoint farms and patch state",
+    "SharePoint/IIS/ULS/identity evidence",
+    "Host process, file, and network evidence",
+    "Severity/confidence/disposition",
+    "CHASER phase breakdown",
+    "Evidence summary",
+    "Tool activity summary",
+    "Limitations/telemetry gaps",
+    "Recommendations"
+  ],
+  "references": [
+    {
+      "title": "NVD CVE-2026-45659",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-45659"
+    },
+    {
+      "title": "Microsoft Security Update Guide CVE-2026-45659",
+      "url": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-45659"
+    },
+    {
+      "title": "CISA KEV CVE-2026-45659",
+      "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve=CVE-2026-45659"
+    },
+    {
+      "title": "The Hacker News SharePoint RCE CVE-2026-45659 Added to CISA KEV",
+      "url": "https://thehackernews.com/2026/07/sharepoint-rce-cve-2026-45659-added-to.html"
+    },
+    {
+      "title": "MITRE ATT&CK T1190 Exploit Public-Facing Application",
+      "url": "https://attack.mitre.org/techniques/T1190/"
+    },
+    {
+      "title": "MITRE ATT&CK T1505.003 Web Shell",
+      "url": "https://attack.mitre.org/techniques/T1505/003/"
+    }
+  ]
+}
