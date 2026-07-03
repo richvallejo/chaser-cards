@@ -4,7 +4,7 @@
   "publisher": "Richard Vallejo",
   "publisher_url": "https://richardvallejo.com",
   "license": "CC BY 4.0",
-  "updated": "2026-06-30",
+  "updated": "2026-07-02",
   "chaser_model": {
     "version": "2026-06-18",
     "source": "https://richardvallejo.com/chaser.html",
@@ -523,6 +523,49 @@
       "created": "2026-06-30",
       "updated": "2026-06-30",
       "cve": "CVE-2026-48558"
+    },
+    {
+      "id": "CHASER-0017",
+      "slug": "fortibleed-credential-theft",
+      "title": "FortiBleed Credential Theft",
+      "subtitle": "FortiGate Access to Ransomware Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Credential Access",
+        "VPN",
+        "Ransomware",
+        "Edge"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1078",
+          "name": "Valid Accounts",
+          "tactic": "Initial Access / Persistence / Privilege Escalation / Defense Evasion"
+        },
+        {
+          "id": "T1133",
+          "name": "External Remote Services",
+          "tactic": "Initial Access / Persistence"
+        },
+        {
+          "id": "T1040",
+          "name": "Network Sniffing",
+          "tactic": "Credential Access / Discovery"
+        }
+      ],
+      "required_tool_categories": [
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "IDENTITY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0017-fortibleed-credential-theft.png",
+      "json": "json/CHASER-0017-fortibleed-credential-theft.json",
+      "created": "2026-07-02",
+      "updated": "2026-07-02"
     }
   ]
 }
