@@ -4,7 +4,7 @@
   "publisher": "Richard Vallejo",
   "publisher_url": "https://richardvallejo.com",
   "license": "CC BY 4.0",
-  "updated": "2026-07-02",
+  "updated": "2026-07-14",
   "chaser_model": {
     "version": "2026-06-18",
     "source": "https://richardvallejo.com/chaser.html",
@@ -605,6 +605,49 @@
       "created": "2026-07-02",
       "updated": "2026-07-02",
       "cve": "CVE-2026-45659"
+    },
+    {
+      "id": "CHASER-0019",
+      "slug": "jscrambler-npm-supply-chain-credential-theft",
+      "title": "Jscrambler npm Supply-Chain Credential Theft",
+      "subtitle": "Compromised Build Dependency Hunt",
+      "version": "1.0.0",
+      "status": "active",
+      "categories": [
+        "Software Supply Chain",
+        "npm",
+        "Credential Theft",
+        "Developer Infrastructure"
+      ],
+      "mitre_attack": [
+        {
+          "id": "T1195.002",
+          "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+          "tactic": "Initial Access"
+        },
+        {
+          "id": "T1059.007",
+          "name": "Command and Scripting Interpreter: JavaScript",
+          "tactic": "Execution"
+        },
+        {
+          "id": "T1552.001",
+          "name": "Unsecured Credentials: Credentials In Files",
+          "tactic": "Credential Access"
+        }
+      ],
+      "required_tool_categories": [
+        "CLOUD",
+        "EDR",
+        "ENDPOINT_ASSET_INVENTORY",
+        "NETWORK",
+        "SIEM",
+        "VULNERABILITY_MANAGEMENT"
+      ],
+      "image": "CHASER-0019-jscrambler-npm-supply-chain-credential-theft.png",
+      "json": "json/CHASER-0019-jscrambler-npm-supply-chain-credential-theft.json",
+      "created": "2026-07-14",
+      "updated": "2026-07-14"
     }
   ]
 }
