@@ -20,13 +20,6 @@ Each card has:
 The card structure groups Context and Hypothesis under Preparation, Analyze
 and Strategize under Action, and Execute and Review under Response.
 
-## Card Creation Notes
-
-New card PNGs must keep the same visual system as the existing card set.
-The RV logo and the Preparation, Action, and Response heading icons should
-match the checked-in cards exactly; do not use fallback-drawn or redrawn
-approximations for those shared visual assets.
-
 ## Repository Layout
 
 ```text
